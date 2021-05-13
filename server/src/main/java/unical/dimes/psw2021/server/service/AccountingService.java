@@ -38,13 +38,13 @@ public class AccountingService {
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
 
-    @Value("${keycloak.auth-server-url}")  String serverUrl;
-    @Value("${admin.username.keycloak}") String adminUsername;
-    @Value("${keycloak.client-key-password}") String adminPwd;
-    @Value("${keycloak.resource}") String clientId;
-    @Value("${keycloak.realm}") String realm;
-    @Value("${keycloak.credentials.secret}") String clientSecret;
-    String role = "user";
+    @Value("${keycloak.auth-server-url}") private String serverUrl;
+    @Value("${admin.username.keycloak}") private String adminUsername;
+    @Value("${keycloak.client-key-password}")  private String adminPwd;
+    @Value("${keycloak.resource}") private String clientId;
+    @Value("${keycloak.realm}") private String realm;
+    @Value("${keycloak.credentials.secret}") private String clientSecret;
+    @Value("${role.user}") public final String USER_ROLE = "user";
 
 
     @Autowired
@@ -98,7 +98,7 @@ public class AccountingService {
         ClientRepresentation app1Client = realmResource.clients().findByClientId(clientId).get(0);
 
         // Get client level role (requires view-clients role)
-        RoleRepresentation userClientRole = realmResource.clients().get(app1Client.getId()).roles().get(role).toRepresentation();
+        RoleRepresentation userClientRole = realmResource.clients().get(app1Client.getId()).roles().get(USER_ROLE).toRepresentation();
         // Assign client level role to user
         userResource.roles().clientLevel(app1Client.getId()).add(Arrays.asList(userClientRole));
 
@@ -129,7 +129,6 @@ public class AccountingService {
     }
 
     private Keycloak getKeycloakObj(){
-        System.out.println(serverUrl);
         return KeycloakBuilder.builder()
                 .serverUrl(serverUrl)
                 .realm(realm)

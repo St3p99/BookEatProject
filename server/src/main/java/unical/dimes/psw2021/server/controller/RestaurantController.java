@@ -6,6 +6,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import unical.dimes.psw2021.server.model.Reservation;
@@ -19,10 +20,9 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.springframework.beans.support.PagedListHolder.DEFAULT_PAGE_SIZE;
-
 @RestController
 @RequestMapping(path = "${base.url}/restaurants")
+@PreAuthorize("hasAuthority('restaurant_manager')")
 public class RestaurantController {
     private final RestaurantService restaurantService;
 
@@ -34,7 +34,7 @@ public class RestaurantController {
     /**
      * POST OPERATION
      ***/
-    @Operation(summary = "Add new restaurant")
+    @Operation(method = "newRestaurant")
     @PostMapping("/new")
     public ResponseEntity newRestaurant(@RequestBody @Valid Restaurant restaurant) {
         try {
@@ -48,7 +48,7 @@ public class RestaurantController {
         }
     }//newRestaurant
 
-    @Operation(summary = "Add new table service")
+    @Operation(method = "newTableService")
     @PostMapping(value = "/{id}/services/new")
     public ResponseEntity newTableService(@PathVariable Long id, @RequestBody @Valid TableService tableService, BindingResult bindingResult) {
 
@@ -76,7 +76,7 @@ public class RestaurantController {
     /**
      * GET OPERATION
      ***/
-    @Operation(summary = "Return all table service of the restauraunt with id")
+    @Operation(method = "getTableServices", summary = "Return all table service of the restauraunt with id")
     @GetMapping(path = "/{id}/services")
     public ResponseEntity getTableServices(@PathVariable Long id) {
         try {
@@ -89,7 +89,7 @@ public class RestaurantController {
         }
     }//getTableServices
 
-    @Operation(summary = "Return reservations of the restauraunt with id")
+    @Operation(method = "getReservationsByRestaurantAndDate", summary = "Return reservations of the restauraunt with id")
     @GetMapping(path = "/{id}/reservations/{date}")
     public ResponseEntity getReservationsByRestaurantAndDate(
             @PathVariable Long id,
@@ -112,7 +112,7 @@ public class RestaurantController {
     /**
      * DELETE OPERATION
      ***/
-    @Operation(summary = "Reject a reservation")
+    @Operation(method = "rejectReservation", summary = "Reject a reservation")
     @DeleteMapping(path = "/reservations/delete/{id}")
     public ResponseEntity rejectReservation(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
@@ -121,14 +121,14 @@ public class RestaurantController {
         //TODO
     }
 
-    @Operation(summary = "Delete restaurant")
+    @Operation(method = "deleteRestaurant", summary = "Delete restaurant")
     @DeleteMapping(path = "/delete/{id}")
     public ResponseEntity deleteRestaurant(@PathVariable Long id) {
         restaurantService.deleteRestaurant(id);
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Delete a table service")
+    @Operation(method = "deleteTableService", summary = "Delete a table service")
     @DeleteMapping(path = "/services/delete/{id}")
     public ResponseEntity deleteTableService(@PathVariable Long id) {
         restaurantService.deleteTableService(id);

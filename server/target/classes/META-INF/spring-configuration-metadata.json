@@ -17,6 +17,11 @@
       "description": "Description for default.average.meal.duration."
     },
     {
+      "name": "role.user",
+      "type": "java.lang.String",
+      "description": "Description for role.user."
+    },
+    {
       "name": "server.keycloak.port",
       "type": "java.lang.String",
       "description": "Description for server.keycloak.port."

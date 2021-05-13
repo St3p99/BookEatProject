@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import unical.dimes.psw2021.server.model.Reservation;
@@ -20,6 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("${base.url}/users")
+@PreAuthorize("hasAuthority('user')")
 public class UserController {
     private final AccountingService accountingService;
     private final UserService userService;
@@ -35,8 +37,9 @@ public class UserController {
     /**
      * POST OPERATION
      **/
+    @Operation(method="newUser")
     @PostMapping(path = "/new")
-    public ResponseEntity create(@RequestBody @Valid User user, BindingResult bindingResult, @RequestParam(value = "pwd") String pwd) {
+    public ResponseEntity newUser(@RequestBody @Valid User user, BindingResult bindingResult, @RequestParam(value = "pwd") String pwd) {
         if (bindingResult.hasErrors()) return ResponseEntity.badRequest().build();
         try {
             return ResponseEntity
@@ -50,6 +53,7 @@ public class UserController {
     /**
      * GET OPERATION
      **/
+    @Operation(method="getUser")
     @GetMapping("/{id}")
     public ResponseEntity getUser(@PathVariable Long id) {
         try {
@@ -61,7 +65,7 @@ public class UserController {
         }
     }
 
-    @Operation(summary = "Return reservations of the user with id")
+    @Operation(method = "getReservations", summary = "Return reservations of the user with id")
     @GetMapping(path = "/{id}/reservations")
     public ResponseEntity getReservations(@PathVariable Long id){
         try {
@@ -77,6 +81,7 @@ public class UserController {
     /**
      * DELETE OPERATION
      **/
+    @Operation(method = "deleteUser")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity deleteUser(@PathVariable Long id){
         accountingService.deleteUser(id);

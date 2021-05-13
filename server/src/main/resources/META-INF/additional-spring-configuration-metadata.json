@@ -19,6 +19,11 @@
       "name": "admin.username.keycloak",
       "type": "java.lang.String",
       "description": "Description for admin.username.keycloak."
+    },
+    {
+      "name": "role.user",
+      "type": "java.lang.String",
+      "description": "Description for role.user."
     }
   ]
 }

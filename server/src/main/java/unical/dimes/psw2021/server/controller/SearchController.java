@@ -27,7 +27,7 @@ public class SearchController {
     /**
      * GET OPERATION
      **/
-    @Operation(summary = "Search for restaurants by name and country then return paged content")
+    @Operation(method = "getByNameAndCountry", summary = "Search for restaurants by name and country then return paged content")
     @GetMapping(path = "/paged/byNameAndCountry")
     public ResponseEntity getByNameAndCountry(
             @RequestParam(value = "name") String name,
@@ -45,7 +45,7 @@ public class SearchController {
         return ResponseEntity.ok(result);
     }//getByNameAndCountry
 
-    @Operation(summary = "Search for restaurants by country and return paged content")
+    @Operation(method = "getByCountry", summary = "Search for restaurants by country and return paged content")
     @GetMapping(path = "/paged/byCountry")
     public ResponseEntity getByCountry(
             @RequestParam(value = "country") String country,

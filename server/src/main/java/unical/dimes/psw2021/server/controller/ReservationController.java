@@ -6,6 +6,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import unical.dimes.psw2021.server.model.Reservation;
@@ -23,6 +24,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("${base.url}/booking")
+@PreAuthorize("hasAnyAuthority('user', 'restaurant_manager')")
 public class ReservationController {
     private final RestaurantService restaurantService;
     private final ReservationService reservationService;
@@ -36,7 +38,7 @@ public class ReservationController {
     /**
      * POST OPERATION
      **/
-    @Operation(summary = "Create a new Reservation")
+    @Operation(method = "newReservation", summary = "Create a new Reservation")
     @PostMapping(path = "/new")
     public ResponseEntity newReservation(
             @RequestBody @Valid Reservation reservation, BindingResult bindingResult) {
@@ -67,7 +69,7 @@ public class ReservationController {
     /**
      * GET OPERATION
      **/
-    @Operation(summary = "Return table service available on date for the restauraunt with id")
+    @Operation(method = "getTableServicesByDate", summary = "Return table service available on date for the restauraunt with id")
     @GetMapping(path = "/{restaurantId}/services/{date}")
     public ResponseEntity getTableServicesByDate(
             @PathVariable Long restaurantId,
@@ -82,7 +84,7 @@ public class ReservationController {
         }
     }//getTableServices
 
-    @Operation(summary = "Returns availability")
+    @Operation(method = "getAvailability", summary = "Returns availability")
     @GetMapping(path = "/availability/{serviceId}/{date}/{time}/{nGuests}")
     public ResponseEntity getAvailability(
             @PathVariable Long serviceId,
