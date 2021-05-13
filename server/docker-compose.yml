@@ -1,0 +1,30 @@
+#version: '3'
+#
+#services:
+#  server:
+#    build:
+#      dockerfile: DockerFile
+#      context: ./
+#    container_name: app
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - db
+#    environment:
+#      - spring.datasource.url=jdbc:postgresql://db:5432/
+##      - spring.datasource.username=postgres
+##      - spring.datasource.password=psw2021
+#      - spring.jpa.hibernate.ddl-auto=update
+#      - spring.jpa.show-sql=true
+#      - spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+#      - spring.jpa.properties.hibernate.format_sql=true
+#      - server.error.include-message=always
+#    links:
+#      - "db:db"
+#  db:
+#    image: 'postgres:13.1-alpine'
+#    container_name: db
+#    environment:
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=psw2021
+#      - POSTGRES_DB=bsdb

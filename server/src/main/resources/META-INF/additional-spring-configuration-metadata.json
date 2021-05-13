@@ -1,0 +1,24 @@
+{
+  "properties": [
+    {
+      "name": "base.url",
+      "type": "java.lang.String",
+      "description": "Description for base.url."
+    },
+    {
+      "name": "default.average.meal.duration",
+      "type": "java.lang.Integer",
+      "description": "Description for default.average.meal.duration."
+    },
+    {
+      "name": "server.keycloak.port",
+      "type": "java.lang.String",
+      "description": "Description for server.keycloak.port."
+    },
+    {
+      "name": "admin.username.keycloak",
+      "type": "java.lang.String",
+      "description": "Description for admin.username.keycloak."
+    }
+  ]
+}
