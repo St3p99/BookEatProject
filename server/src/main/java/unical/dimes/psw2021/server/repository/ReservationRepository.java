@@ -16,8 +16,4 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findByRestaurantAndDate(Restaurant restaurant, LocalDate date);
     List<Reservation> findByTableService(TableService tableService);
     boolean existsByUserAndRestaurantAndDateAndStartTime(User user, Restaurant restaurant, LocalDate date, LocalTime startTime);
-
-    void deleteAllByUser(User user);
-
-    List<Reservation> findByTableServiceAndDate(TableService tableService, LocalDate date);
 }

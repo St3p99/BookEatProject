@@ -6,6 +6,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import unical.dimes.psw2021.server.model.Reservation;
 import unical.dimes.psw2021.server.model.TableService;
@@ -38,7 +39,10 @@ public class ReservationController {
     @Operation(summary = "Create a new Reservation")
     @PostMapping(path = "/new")
     public ResponseEntity newReservation(
-            @RequestBody @Valid Reservation reservation) {
+            @RequestBody @Valid Reservation reservation, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) return ResponseEntity.badRequest().build();
+
         try {
             return ResponseEntity
                     .status(HttpStatus.CREATED)

@@ -108,13 +108,6 @@ public class AccountingService {
 
     }
 
-
-    @Transactional(readOnly = true)
-    public User getById(Long id) throws ResourceNotFoundException {
-        return userRepository.findById(id).
-                orElseThrow(ResourceNotFoundException::new);
-    }
-
     @Transactional
     public void deleteUser(Long id) {
         Optional<User> opt = userRepository.findById(id);
@@ -148,10 +141,5 @@ public class AccountingService {
                 .build();
     }
 
-    public List<Reservation> showReservations(Long id) throws ResourceNotFoundException {
-        Optional<User> optUser = userRepository.findById(id);
-        if(optUser.isEmpty()) throw new ResourceNotFoundException();
 
-        return optUser.get().getReservations();
-    }
 }

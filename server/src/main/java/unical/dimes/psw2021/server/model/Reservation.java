@@ -65,11 +65,11 @@ public class Reservation {
     @JoinColumn(name = "customer_id", nullable = false)
     private User user;
 
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant; // if null the reservation was rejected by restaurant manager
 
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "table_service_id")
     private TableService tableService;

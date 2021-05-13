@@ -1,18 +1,16 @@
 package unical.dimes.psw2021.server.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import org.keycloak.OAuth2Constants;
-import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import unical.dimes.psw2021.server.model.Reservation;
 import unical.dimes.psw2021.server.model.User;
 import unical.dimes.psw2021.server.service.AccountingService;
+import unical.dimes.psw2021.server.service.UserService;
 import unical.dimes.psw2021.server.support.ResponseMessage;
 import unical.dimes.psw2021.server.support.exception.UniqueKeyViolationException;
 
@@ -20,17 +18,17 @@ import javax.validation.Valid;
 
 import java.util.List;
 
-import static org.springframework.beans.support.PagedListHolder.DEFAULT_PAGE_SIZE;
-
 @RestController
 @RequestMapping("${base.url}/users")
-public class AccountingController {
+public class UserController {
     private final AccountingService accountingService;
+    private final UserService userService;
 
 
     @Autowired
-    public AccountingController(AccountingService accountingService) {
+    public UserController(AccountingService accountingService, UserService userService) {
         this.accountingService = accountingService;
+        this.userService = userService;
     }
 
 
@@ -38,7 +36,8 @@ public class AccountingController {
      * POST OPERATION
      **/
     @PostMapping(path = "/new")
-    public ResponseEntity create(@RequestBody @Valid User user, @RequestParam(value = "pwd") String pwd) {
+    public ResponseEntity create(@RequestBody @Valid User user, BindingResult bindingResult, @RequestParam(value = "pwd") String pwd) {
+        if (bindingResult.hasErrors()) return ResponseEntity.badRequest().build();
         try {
             return ResponseEntity
                     .status(HttpStatus.CREATED)
@@ -54,7 +53,7 @@ public class AccountingController {
     @GetMapping("/{id}")
     public ResponseEntity getUser(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok(accountingService.getById(id));
+            return ResponseEntity.ok(userService.getById(id));
         } catch (ResourceNotFoundException e) {
             return new ResponseEntity<>(
                     new ResponseMessage("User not found!"),
@@ -66,7 +65,7 @@ public class AccountingController {
     @GetMapping(path = "/{id}/reservations")
     public ResponseEntity getReservations(@PathVariable Long id){
         try {
-            List<Reservation> result = accountingService.showReservations(id);
+            List<Reservation> result = userService.showReservations(id);
             if (result.size() <= 0)
                 return ResponseEntity.noContent().build();
             return ResponseEntity.ok(result);

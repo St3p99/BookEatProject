@@ -8,6 +8,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
@@ -34,33 +35,33 @@ public class Restaurant {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @NotBlank(message = "Name is mandatory")
+    @NotBlank
     @Basic
     @Column(name = "name", nullable = false)
     private String name;
 
-    @NotBlank(message = "Country is mandatory")
+    @NotBlank
     @Column(name = "country", nullable = false, length = 30)
     private String country;
 
-    @NotBlank(message = "City is mandatory")
+    @NotBlank
     @Column(name = "city", nullable = false, length = 30)
     private String city;
 
-    @NotBlank(message = "Address is mandatory")
+    @NotBlank
     @Column(name = "address", nullable = false, length = 50)
     private String address;
 
-    @NotBlank(message = "Private phone is mandatory")
+    @NotBlank
     @Basic
     @Column(name = "private phone", nullable = false)
     private String privatePhone;
 
-    @Basic
-    @Column(name = "public_phone")
+    @NotBlank
+    @Column(name = "public_phone", nullable = false)
     private String publicPhone;
 
-    @Basic
+    @NotBlank
     @Column(name = "private_mail", nullable = false)
     private String privateMail;
 
@@ -68,6 +69,7 @@ public class Restaurant {
     @Column(name = "public_mail")
     private String publicMail;
 
+    @NotNull
     @Positive
     @Basic
     @Column(name = "seating_capacity", nullable = false)

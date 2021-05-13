@@ -6,6 +6,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import unical.dimes.psw2021.server.model.Reservation;
 import unical.dimes.psw2021.server.model.Restaurant;
@@ -49,7 +50,10 @@ public class RestaurantController {
 
     @Operation(summary = "Add new table service")
     @PostMapping(value = "/{id}/services/new")
-    public ResponseEntity newTableService(@PathVariable Long id, @RequestBody @Valid TableService tableService) {
+    public ResponseEntity newTableService(@PathVariable Long id, @RequestBody @Valid TableService tableService, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) return ResponseEntity.badRequest().build();
+
         try {
             return ResponseEntity
                     .status(HttpStatus.CREATED)
@@ -85,14 +89,14 @@ public class RestaurantController {
         }
     }//getTableServices
 
-    @Operation(summary = "Return reservations of the restauraunt per table service with id")
+    @Operation(summary = "Return reservations of the restauraunt with id")
     @GetMapping(path = "/{id}/reservations/{date}")
-    public ResponseEntity getReservationsByServiceAndDate(
+    public ResponseEntity getReservationsByRestaurantAndDate(
             @PathVariable Long id,
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
             ){
         try {
-            List<Reservation> result = restaurantService.showReservationsByServiceAndDate(id, date);
+            List<Reservation> result = restaurantService.showReservationsByRestaurantAndDate(id, date);
             if (result.size() <= 0)
                 return ResponseEntity.noContent().build();
             return ResponseEntity.ok(result);
@@ -111,8 +115,10 @@ public class RestaurantController {
     @Operation(summary = "Reject a reservation")
     @DeleteMapping(path = "/reservations/delete/{id}")
     public ResponseEntity rejectReservation(@PathVariable Long id) {
-        restaurantService.rejectReservation(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+        //        restaurantService.rejectReservation(id);
+        //        return ResponseEntity.noContent().build();
+        //TODO
     }
 
     @Operation(summary = "Delete restaurant")

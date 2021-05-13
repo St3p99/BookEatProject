@@ -162,21 +162,16 @@ public class RestaurantService {
         return pagedResult.getPageList();
     }
 
-    public List<Reservation> showReservationsByServiceAndDate(Long tableServiceId, LocalDate date) throws ResourceNotFoundException{
-        Optional<TableService> optTableService = tableServiceRepository.findById(tableServiceId);
-        if(optTableService.isEmpty()) throw new ResourceNotFoundException();
+    public List<Reservation> showReservationsByRestaurantAndDate(Long restaurantId, LocalDate date) throws ResourceNotFoundException{
+        Optional<Restaurant> optRestaurant = restaurantRepository.findById(restaurantId);
+        if(optRestaurant.isEmpty()) throw new ResourceNotFoundException();
 
-        List<Reservation> reservations = reservationRepository.findByTableServiceAndDate(optTableService.get(), date);
+        List<Reservation> reservations = reservationRepository.findByRestaurantAndDate(optRestaurant.get(), date);
         return reservations;
     }
 
     @Transactional
     public void rejectReservation(Long id) {
-        Optional<Reservation> opt = reservationRepository.findById(id);
-        if (opt.isEmpty()) return;
-        Reservation reservation = opt.get();
-
-        reservation.setRestaurant(null);
-        reservationRepository.save(reservation);
+        //TODO:
     }
 }
