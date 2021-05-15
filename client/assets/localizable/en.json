@@ -1,0 +1,12 @@
+{
+  "welcome": "welcome",
+  "discover": "discover",
+  "home": "home",
+  "search_what": "search for restaurant name",
+  "search_where": "address, city...",
+  "login": "login",
+  "register": "register",
+  "register_my_restaurant": "register my restaurant",
+  "firstName": "first name",
+  "lastName": "last name"
+}

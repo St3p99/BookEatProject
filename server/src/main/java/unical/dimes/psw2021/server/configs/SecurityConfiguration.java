@@ -35,8 +35,7 @@ import org.springframework.web.filter.CorsFilter;
 @EnableWebSecurity
 @ComponentScan(basePackageClasses = KeycloakSecurityComponents.class)
 public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter {
-    @Value("${base.url}") private String baseUrl;
-    @Value("${role.user}") private String USER_ROLE;
+    @Value("${base-url}") private String baseUrl;
 
 
     @Autowired
@@ -67,6 +66,9 @@ public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter 
         http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
                 .antMatchers(baseUrl+"/search/**").permitAll()
+                .antMatchers(baseUrl+"/users/**").permitAll()
+                .antMatchers(baseUrl+"/booking/**").permitAll()
+                .antMatchers(baseUrl+"/restaurants/**").permitAll()
                 .antMatchers("/v3/api-docs/**").permitAll()
                 .antMatchers("/swagger-ui/**").permitAll()
                 .anyRequest()

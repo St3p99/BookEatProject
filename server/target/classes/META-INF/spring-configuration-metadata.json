@@ -7,17 +7,22 @@
       "description": "Description for admin.username.keycloak."
     },
     {
-      "name": "base.url",
+      "name": "base-url",
       "type": "java.lang.String",
-      "description": "Description for base.url."
+      "description": "Description for base-url."
     },
     {
-      "name": "default.average.meal.duration",
-      "type": "java.lang.Integer",
-      "description": "Description for default.average.meal.duration."
+      "name": "default-average-meal-duration",
+      "type": "java.lang.String",
+      "description": "Description for default-average-meal-duration."
     },
     {
-      "name": "role.user",
+      "name": "role-restaurant-manager",
+      "type": "java.lang.String",
+      "description": "Description for role.restaurant-manager."
+    },
+    {
+      "name": "role-user",
       "type": "java.lang.String",
       "description": "Description for role.user."
     },

@@ -12,9 +12,8 @@
     <artifactId>server</artifactId>
     <version>0.0.1</version>
     <name>unical.dimes.psw2021.server</name>
-    <description>Book Eat Server</description>
+    <description>BookIT Server</description>
     <properties>
-        <spring-boot.run.jvmArguments>-Duser.timezone=UTC</spring-boot.run.jvmArguments>
         <java.version>11</java.version>
         <keycloak.version>9.0.2</keycloak.version>
     </properties>
@@ -43,7 +42,6 @@
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session-core</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>

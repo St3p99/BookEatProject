@@ -1,6 +1,7 @@
 package unical.dimes.psw2021.server.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -45,15 +46,18 @@ public class Reservation {
     @Column(name = "booking_timestamp")
     private Date bookingTimestamp;
 
+    @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "reservation_date", nullable = false)
     private LocalDate date;
 
+    @NotNull
     @JsonFormat(pattern = "HH:mm:ss")
     @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
 
     @Basic
+    @NotNull
     @Column(name = "n_guests", nullable = false)
     private int nGuests;
 
@@ -61,6 +65,11 @@ public class Reservation {
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 
+    @Basic
+    @Column(name = "rejected", nullable = false)
+    private boolean rejected = false; // default: false
+
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
     private User user;
@@ -73,4 +82,10 @@ public class Reservation {
     @ManyToOne
     @JoinColumn(name = "table_service_id")
     private TableService tableService;
+
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonIgnore
+    @OneToOne(mappedBy = "reservation")
+    public Review review;
 }

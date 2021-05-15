@@ -6,13 +6,13 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import unical.dimes.psw2021.server.model.Reservation;
 import unical.dimes.psw2021.server.model.TableService;
 import unical.dimes.psw2021.server.service.ReservationService;
 import unical.dimes.psw2021.server.service.RestaurantService;
+import unical.dimes.psw2021.server.service.UserService;
 import unical.dimes.psw2021.server.support.exception.SeatsUnavailable;
 import unical.dimes.psw2021.server.support.exception.UniqueKeyViolationException;
 
@@ -23,16 +23,18 @@ import java.time.LocalTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("${base.url}/booking")
-@PreAuthorize("hasAnyAuthority('user', 'restaurant_manager')")
+@RequestMapping("${base-url}/booking")
+//@PreAuthorize("hasAnyAuthority('user', 'restaurant_manager')")
 public class ReservationController {
     private final RestaurantService restaurantService;
     private final ReservationService reservationService;
+    private final UserService userService;
 
     @Autowired
-    public ReservationController(RestaurantService restaurantService, ReservationService reservationService) {
+    public ReservationController(RestaurantService restaurantService, ReservationService reservationService, UserService userService) {
         this.restaurantService = restaurantService;
         this.reservationService = reservationService;
+        this.userService = userService;
     }
 
     /**
@@ -70,10 +72,10 @@ public class ReservationController {
      * GET OPERATION
      **/
     @Operation(method = "getTableServicesByDate", summary = "Return table service available on date for the restauraunt with id")
-    @GetMapping(path = "/{restaurantId}/services/{date}")
+    @GetMapping(path = "/services")
     public ResponseEntity getTableServicesByDate(
-            @PathVariable Long restaurantId,
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+            @RequestParam("restaurant_id") Long restaurantId,
+            @RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         try {
             List<TableService> result = restaurantService.showTableServicesByDay(restaurantId, date.getDayOfWeek());
             if (result.size() <= 0)
@@ -85,12 +87,12 @@ public class ReservationController {
     }//getTableServices
 
     @Operation(method = "getAvailability", summary = "Returns availability")
-    @GetMapping(path = "/availability/{serviceId}/{date}/{time}/{nGuests}")
+    @GetMapping(path = "/availability/")
     public ResponseEntity getAvailability(
-            @PathVariable Long serviceId,
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @PathVariable @DateTimeFormat(pattern = "HH:mm:ss") LocalTime time,
-            @PathVariable int nGuests) {
+            @RequestParam(name = "service_id") Long serviceId,
+            @RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(name = "time") @DateTimeFormat(pattern = "HH:mm:ss") LocalTime time,
+            @RequestParam(name = "n_guests") int nGuests) {
         try {
             return ResponseEntity.ok(reservationService.getAvailability(serviceId, date, time, nGuests));
         } catch (ResourceNotFoundException e) {
@@ -98,5 +100,14 @@ public class ReservationController {
         }
     }
     /** PUT OPERATION **/
+
     /** DELETE OPERATION **/
+    @Operation(method = "deleteReservation", summary = "Delete a reservation")
+    @DeleteMapping(path = "/reservations/delete/{id}")
+    public ResponseEntity deleteReservation(@PathVariable Long id) {
+        userService.deleteReservation(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }

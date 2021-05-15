@@ -15,7 +15,7 @@ import java.util.List;
 import static org.springframework.beans.support.PagedListHolder.DEFAULT_PAGE_SIZE;
 
 @RestController
-@RequestMapping(path = "${base.url}/search")
+@RequestMapping(path = "${base-url}/search")
 public class SearchController {
     private final RestaurantService restaurantService;
 
@@ -27,11 +27,11 @@ public class SearchController {
     /**
      * GET OPERATION
      **/
-    @Operation(method = "getByNameAndCountry", summary = "Search for restaurants by name and country then return paged content")
-    @GetMapping(path = "/paged/byNameAndCountry")
-    public ResponseEntity getByNameAndCountry(
+    @Operation(method = "getByNameAndCity", summary = "Search for restaurants by name and city then return paged content")
+    @GetMapping(path = "/paged/byNameAndCity")
+    public ResponseEntity getByNameAndCity(
             @RequestParam(value = "name") String name,
-            @RequestParam(value = "country") String country,
+            @RequestParam(value = "city") String city,
             @RequestParam(value = "pageNumber",
                     defaultValue = "0") int pageNumber,
             @RequestParam(value = "pageSize",
@@ -39,26 +39,25 @@ public class SearchController {
             @RequestParam(value = "sortBy",
                     defaultValue = "id") String sortBy) {
         List<Restaurant> result = restaurantService.
-                showRestaurantByNameAndCountry(name, country, pageNumber, pageSize, sortBy);
+                showRestaurantByNameAndCity(name, city, pageNumber, pageSize, sortBy);
         if (result.size() <= 0)
             return ResponseEntity.noContent().build();
         return ResponseEntity.ok(result);
-    }//getByNameAndCountry
+    }//getByNameAndCity
 
-    @Operation(method = "getByCountry", summary = "Search for restaurants by country and return paged content")
-    @GetMapping(path = "/paged/byCountry")
-    public ResponseEntity getByCountry(
-            @RequestParam(value = "country") String country,
+    @Operation(method = "getbyCity", summary = "Search for restaurants by city and return paged content")
+    @GetMapping(path = "/paged/byCity")
+    public ResponseEntity getByCity(
+            @RequestParam(value = "city") String city,
             @RequestParam(value = "pageNumber",
                     defaultValue = "0") int pageNumber,
             @RequestParam(value = "pageSize",
                     defaultValue = DEFAULT_PAGE_SIZE + "") int pageSize,
             @RequestParam(value = "sortBy",
                     defaultValue = "id") String sortBy) {
-        List<Restaurant> result = restaurantService.showRestaurantByCountry(country, pageNumber, pageSize, sortBy);
+        List<Restaurant> result = restaurantService.showRestaurantByCity(city, pageNumber, pageSize, sortBy);
         if (result.size() <= 0)
             return ResponseEntity.noContent().build();
         return ResponseEntity.ok(result);
-    }//getByCountry
-
+    }//getByCity
 }

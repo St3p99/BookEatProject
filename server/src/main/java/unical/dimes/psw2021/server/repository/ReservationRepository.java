@@ -10,10 +10,16 @@ import unical.dimes.psw2021.server.model.User;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-    List<Reservation> findByRestaurantAndDate(Restaurant restaurant, LocalDate date);
-    List<Reservation> findByTableService(TableService tableService);
-    boolean existsByUserAndRestaurantAndDateAndStartTime(User user, Restaurant restaurant, LocalDate date, LocalTime startTime);
+    List<Reservation> findByUserAndRejectedTrue(User user);
+
+    List<Reservation> findByUserAndRejectedFalse(User user);
+    List<Reservation> findByRestaurantAndDateAndRejectedFalse(Restaurant restaurant, LocalDate date);
+    List<Reservation> findByTableServiceAndRejectedFalse(TableService tableService);
+    boolean existsByUserAndRestaurantAndDateAndStartTimeAndRejectedFalse(User user, Restaurant restaurant, LocalDate date, LocalTime startTime);
+
+    Optional<Reservation> findByIdAndRejectedFalse(Long id);
 }

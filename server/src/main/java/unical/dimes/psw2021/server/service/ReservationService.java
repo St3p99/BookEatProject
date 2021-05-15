@@ -34,7 +34,7 @@ public class ReservationService {
     @Autowired
     private EntityManager entityManager;
 
-    @Value("${default.average.meal.duration}")
+    @Value("${default-average-meal-duration}")
     private int defaultAvgMealDuration;
 
 
@@ -52,7 +52,7 @@ public class ReservationService {
             if (!itIsAcceptable(tableService, date, startTime)) return false;
 
             List<Reservation> reservationsOfRestaurantInDate = reservationRepository.
-                    findByRestaurantAndDate(tableService.getRestaurant(), date);
+                    findByRestaurantAndDateAndRejectedFalse(tableService.getRestaurant(), date);
 
             int reservedSeats = countReservedSeats(reservationsOfRestaurantInDate, tableService, startTime);
             return tableService.getRestaurant().getSeatingCapacity() - reservedSeats - nGuests >= 0;
@@ -71,7 +71,7 @@ public class ReservationService {
         if (optUser.isEmpty()) throw new ResourceNotFoundException();
         newReservation.setUser(optUser.get());
 
-        if (reservationRepository.existsByUserAndRestaurantAndDateAndStartTime(
+        if (reservationRepository.existsByUserAndRestaurantAndDateAndStartTimeAndRejectedFalse(
                 newReservation.getUser(),
                 newReservation.getRestaurant(),
                 newReservation.getDate(),
@@ -97,7 +97,7 @@ public class ReservationService {
         if (!itIsAcceptable(tableService, date, startTime)) return false;
 
         List<Reservation> reservationsOfRestaurantInDate = reservationRepository.
-                findByRestaurantAndDate(tableService.getRestaurant(), date);
+                findByRestaurantAndDateAndRejectedFalse(tableService.getRestaurant(), date);
 
         int reservedSeats = countReservedSeats(reservationsOfRestaurantInDate, tableService, startTime);
         return tableService.getRestaurant().getSeatingCapacity() - reservedSeats - nGuests >= 0;

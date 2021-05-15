@@ -3,7 +3,6 @@ package unical.dimes.psw2021.server.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.support.MutableSortDefinition;
 import org.springframework.beans.support.PagedListHolder;
-import org.springframework.beans.support.SortDefinition;
 import org.springframework.data.domain.*;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
@@ -39,19 +38,19 @@ public class RestaurantService {
     }
 
     @Transactional(readOnly = true)
-    public List<Restaurant> showRestaurantByNameAndCountry(
-            String name, String country, int pageNumber, int pageSize, String sortBy) {
+    public List<Restaurant> showRestaurantByNameAndCity(
+            String name, String city, int pageNumber, int pageSize, String sortBy) {
 
         Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy));
-        Page<Restaurant> pagedResult = restaurantRepository.findByNameIgnoreCaseContainingAndCountryIgnoreCase(name, country, paging);
+        Page<Restaurant> pagedResult = restaurantRepository.findByNameIgnoreCaseContainingAndCityIgnoreCase(name, city, paging);
         return pagedResult.hasContent() ? pagedResult.getContent() : new ArrayList<>();
     }
 
     @Transactional(readOnly = true)
-    public List<Restaurant> showRestaurantByCountry(String country, int pageNumber, int pageSize, String sortBy) {
+    public List<Restaurant> showRestaurantByCity(String city, int pageNumber, int pageSize, String sortBy) {
 
         Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy));
-        Page<Restaurant> pagedResult = restaurantRepository.findByCountryIgnoreCase(country, paging);
+        Page<Restaurant> pagedResult = restaurantRepository.findByCityIgnoreCase(city, paging);
         return pagedResult.hasContent() ? pagedResult.getContent() : new ArrayList<>();
     }
 
@@ -75,6 +74,7 @@ public class RestaurantService {
         restaurantRepository.delete(r);
     }
 
+    @Transactional
     public TableService addTableService(Long restaurantId, TableService newTableService) throws UniqueKeyViolationException, TableServiceOverlapException, ResourceNotFoundException {
         Optional<Restaurant> optRestaurant = restaurantRepository.findById(restaurantId);
         if (optRestaurant.isEmpty()) throw new ResourceNotFoundException();
@@ -94,7 +94,8 @@ public class RestaurantService {
         return tableServiceRepository.save(newTableService);
     }
 
-    private Optional<TableService> checkOverlap(TableService newTableService) {
+    @Transactional(readOnly = true)
+    public Optional<TableService> checkOverlap(TableService newTableService) {
         List<TableService> existingTableServices =
                 tableServiceRepository.findByRestaurant(newTableService.getRestaurant());
         LocalTime newStartHour = newTableService.getStartTime();
@@ -139,7 +140,7 @@ public class RestaurantService {
         Optional<TableService> opt = tableServiceRepository.findById(id);
         if (opt.isEmpty()) return;
         TableService tableService = opt.get();
-        List<Reservation> reservations = reservationRepository.findByTableService(tableService);
+        List<Reservation> reservations = reservationRepository.findByTableServiceAndRejectedFalse(tableService);
         // set reservations out of service
         reservations.forEach(reservation -> {
             reservation.setTableService(null);
@@ -148,6 +149,7 @@ public class RestaurantService {
         tableServiceRepository.delete(tableService);
     }
 
+    @Transactional(readOnly = true)
     public List<Reservation> showReservations(Long id,  int pageNumber, int pageSize, String sortBy) throws ResourceNotFoundException {
         Optional<Restaurant> optRestaurant = restaurantRepository.findById(id);
         if(optRestaurant.isEmpty()) throw new ResourceNotFoundException();
@@ -162,16 +164,21 @@ public class RestaurantService {
         return pagedResult.getPageList();
     }
 
+    @Transactional(readOnly = true)
     public List<Reservation> showReservationsByRestaurantAndDate(Long restaurantId, LocalDate date) throws ResourceNotFoundException{
         Optional<Restaurant> optRestaurant = restaurantRepository.findById(restaurantId);
         if(optRestaurant.isEmpty()) throw new ResourceNotFoundException();
 
-        List<Reservation> reservations = reservationRepository.findByRestaurantAndDate(optRestaurant.get(), date);
+        List<Reservation> reservations = reservationRepository.findByRestaurantAndDateAndRejectedFalse(optRestaurant.get(), date);
         return reservations;
     }
 
     @Transactional
     public void rejectReservation(Long id) {
-        //TODO:
+        Optional<Reservation> opt = reservationRepository.findById(id);
+        if (opt.isEmpty()) return;
+        Reservation reservation = opt.get();
+        reservation.setRejected(true);
+        reservationRepository.save(reservation);
     }
 }

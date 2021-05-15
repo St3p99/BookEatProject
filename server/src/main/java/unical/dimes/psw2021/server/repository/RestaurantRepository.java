@@ -8,9 +8,9 @@ import unical.dimes.psw2021.server.model.Restaurant;
 
 @Repository
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
-    Page<Restaurant> findByNameIgnoreCaseContainingAndCountryIgnoreCase(String name, String country, Pageable pageable);
+    Page<Restaurant> findByNameIgnoreCaseContainingAndCityIgnoreCase(String name, String city, Pageable pageable);
 
-    Page<Restaurant> findByCountryIgnoreCase(String country, Pageable pageable);
+    Page<Restaurant> findByCityIgnoreCase(String city, Pageable pageable);
 
     boolean existsByNameAndCityAndAddress(String name, String city, String address);
 }

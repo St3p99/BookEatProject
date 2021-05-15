@@ -1,16 +1,12 @@
-class Constants {
-  // app info
-  static final String APP_VERSION = "0.0.1";
-  static final String APP_NAME = "BookEat";
-
+class Constants{
   // addresses
-  static final String ADDRESS_STORE_SERVER = "***";
-  static final String ADDRESS_AUTHENTICATION_SERVER = "***";
+  static final String ADDRESS_STORE_SERVER = "http://localhost:8080/api/";
+  static final String ADDRESS_AUTHENTICATION_SERVER = "http://localhost:8081/auth";
 
   // authentication
-  static final String REALM = "***";
-  static final String CLIENT_ID = "***";
-  static final String CLIENT_SECRET = "***";
+  static final String REALM = "BookIT-Realm";
+  static final String CLIENT_ID = "springboot-microservice";
+  static final String CLIENT_SECRET = "dbdfddec-e0a3-4d0c-9ef0-c46fca0d248c";
   static final String REQUEST_LOGIN = "/auth/realms/" + REALM + "/protocol/openid-connect/token";
   static final String REQUEST_LOGOUT = "/auth/realms/" + REALM + "/protocol/openid-connect/logout";
 
@@ -18,7 +14,7 @@ class Constants {
   static final String REQUEST_SEARCH_PRODUCTS = "/products/search/by_name";
   static final String REQUEST_ADD_USER = "/users";
 
-  // states
+  // roles
   static final String STATE_CLUB = "club";
 
   // responses
@@ -26,6 +22,4 @@ class Constants {
 
   // messages
   static final String MESSAGE_CONNECTION_ERROR = "connection_error";
-
-
 }

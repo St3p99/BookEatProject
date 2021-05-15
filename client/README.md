@@ -1,6 +1,6 @@
 # client
 
-BookEat - Frontend
+BookIT - frontend
 
 ## Getting Started
 
