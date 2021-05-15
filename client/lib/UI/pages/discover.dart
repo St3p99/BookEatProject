@@ -99,9 +99,7 @@ class _DiscoverState extends State<Discover> {
             child: Column(
               children: [
                 CustomTextField("search_what", Icons.search),
-                Padding(
-                    padding: EdgeInsets.only(top:10)
-                ),
+                Padding(padding: EdgeInsets.only(top:10)),
                 CustomTextField("search_where", Icons.map)
               ],
             ),
