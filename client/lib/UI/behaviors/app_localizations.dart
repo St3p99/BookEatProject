@@ -1,12 +1,15 @@
 import 'dart:convert';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-
 class AppLocalizations {
   final Locale locale;
+
   AppLocalizations(this.locale);
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
   Map<String, String> _localizedStrings;
 
   static AppLocalizations of(BuildContext context) {
@@ -14,7 +17,8 @@ class AppLocalizations {
   }
 
   Future<bool> load() async {
-    String jsonString = await rootBundle.loadString('assets/localizable/${locale.languageCode}.json');
+    String jsonString = await rootBundle
+        .loadString('assets/localizable/${locale.languageCode}.json');
     Map<String, dynamic> jsonMap = json.decode(jsonString);
     _localizedStrings = jsonMap.map((key, value) {
       return MapEntry(key, value.toString());
@@ -25,11 +29,11 @@ class AppLocalizations {
   String translate(String key) {
     return _localizedStrings[key];
   }
-}//AppLocalizations
+} //AppLocalizations
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
-
 
   @override
   bool isSupported(Locale locale) {

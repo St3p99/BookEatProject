@@ -1,9 +1,11 @@
 {
   "welcome": "benvenuto",
-  "discover": "esplora",
+  "discover": "scopri",
   "home": "home",
+  "search": "cerca",
   "search_what": "cerca un ristorante",
-  "search_where": "indirizzo, città...",
+  "search_where": "cerca per indirizzo, città...",
+  "result_area": "risultati nella tua area",
   "login": "accedi",
   "register": "registrati",
   "register_my_restaurant": "registra il ristorante",
