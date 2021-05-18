@@ -24,6 +24,7 @@ dependencies:
   circular_profile_avatar: ^2.0.0
   percent_indicator: ^3.0.1
   expandable: ^5.0.1
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:

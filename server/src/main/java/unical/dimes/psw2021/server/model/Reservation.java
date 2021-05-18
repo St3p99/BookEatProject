@@ -44,6 +44,7 @@ public class Reservation {
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "booking_timestamp")
+    @JsonIgnore
     private Date bookingTimestamp;
 
     @NotNull

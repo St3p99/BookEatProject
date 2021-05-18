@@ -1,3 +1,6 @@
+import 'package:client/model/objects/table_service.dart';
+import 'package:intl/intl.dart';
+
 class Restaurant {
   int id;
   String name;
@@ -63,12 +66,10 @@ class Restaurant {
   String toString() {
     return name;
   }
-
-
 }
 
-List<Restaurant> restaurantsData = [r1, r2, r3, r4, r5];
-Restaurant r1 = new Restaurant(
+List<Restaurant> restaurantsData = [pizzAmore, accademia, nuSushi, barConti, bufaloBianco];
+Restaurant pizzAmore = new Restaurant(
     name: "PizzAmore",
     city: "Cosenza",
     category: "pizza",
@@ -81,7 +82,21 @@ Restaurant r1 = new Restaurant(
     avgFoodRating: 4.3
 );
 
-Restaurant r2 = new Restaurant(
+List<TableService> tableServicesPizzaAmore = [
+  new TableService(
+    serviceName: "pranzo",
+    daysOfWeek: {
+      'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY',
+    },
+    startTime: "12:00:00",
+    endTime: "14:30:00",
+
+  )
+
+];
+
+
+Restaurant accademia = new Restaurant(
     name: "Accademia Club House",
     city: "Cosenza",
     category: "pub",
@@ -94,7 +109,7 @@ Restaurant r2 = new Restaurant(
     avgFoodRating: 3.3
 );
 
-Restaurant r3 = new Restaurant(
+Restaurant nuSushi = new Restaurant(
     name: "Nu sushi",
     city: "Cosenza",
     category: "sushi",
@@ -107,7 +122,7 @@ Restaurant r3 = new Restaurant(
     avgFoodRating: 3.8
 );
 
-Restaurant r4 = new Restaurant(
+Restaurant barConti = new Restaurant(
     name: "Bar Conti",
     city: "Cosenza",
     category: "cafe",
@@ -120,7 +135,7 @@ Restaurant r4 = new Restaurant(
     avgFoodRating: 1.3
 );
 
-Restaurant r5 = new Restaurant(
+Restaurant bufaloBianco = new Restaurant(
     name: "Bufalo bianco",
     city: "Cosenza",
     category: "grill",

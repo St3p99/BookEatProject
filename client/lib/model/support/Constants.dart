@@ -1,3 +1,5 @@
+// general
+
 // addresses
 const String ADDRESS_STORE_SERVER = "http://localhost:8080/api/";
 const String ADDRESS_AUTHENTICATION_SERVER = "http://localhost:8081/auth";

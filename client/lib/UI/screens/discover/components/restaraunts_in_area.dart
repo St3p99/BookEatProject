@@ -1,5 +1,4 @@
 import 'package:client/UI/behaviors/app_localizations.dart';
-import 'package:client/UI/screens/search/search_screen.dart';
 import 'package:client/UI/support/constants.dart';
 import 'package:client/UI/support/size_config.dart';
 import 'package:client/model/objects/restaurant.dart';
@@ -25,7 +24,7 @@ class _RestaurantsInAreaState extends State<RestaurantsInArea> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: SizeConfig.screenHeight*0.79,
+      height: SizeConfig.screenHeight*0.75,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,7 +78,6 @@ class _RestaurantsInAreaState extends State<RestaurantsInArea> {
                 itemCount: result.length,
                 itemBuilder: (context, index) {
                   return GestureDetector(
-                    //TODO: push to detail page
                       onTap: () => Navigator.push(
                           context,
                           CupertinoPageRoute(

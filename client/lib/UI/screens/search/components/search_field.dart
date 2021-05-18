@@ -23,7 +23,7 @@ class _SearchFieldState extends State<SearchField> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        width: SizeConfig.screenWidth * 0.8,
+        width: SizeConfig.screenWidth*0.75,
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(

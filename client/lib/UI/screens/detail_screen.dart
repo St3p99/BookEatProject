@@ -6,6 +6,7 @@ import 'package:client/model/objects/restaurant.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:line_icons/line_icons.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class DetailScreen extends StatelessWidget {
@@ -45,6 +46,7 @@ class DetailScreen extends StatelessWidget {
                       children: <Widget>[
                         Container(
                           margin: EdgeInsets.only(top:25),
+                          height: SizeConfig.screenHeight*.8,
                           width: SizeConfig.screenWidth,
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -59,18 +61,18 @@ class DetailScreen extends StatelessWidget {
                                 Center(
                                   child: Icon( Icons.drag_handle_rounded, color: Colors.black38),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                  child: Flexible(
-                                      child: Text(
-                                        restaurant.name,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 30
+                                Flexible(
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                    child:Text(
+                                          restaurant.name,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 30
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                ),
+                                  ),
                                 Padding(
                                   padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                                   child: Text(
@@ -80,24 +82,24 @@ class DetailScreen extends StatelessWidget {
                                     textAlign: TextAlign.left,
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.fromLTRB(5, 5, 10, 0),
-                                  child: Flexible(
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.location_on,
-                                          color: kTextLightColor,
-                                        ),
-                                        Text(
-                                            "${restaurant.address.capitalizeFirstOfEach}",
-                                            style: TextStyle(
-                                                color: kTextColor, fontWeight: FontWeight.normal),
-                                            textAlign: TextAlign.left),
-                                      ],
+                                Flexible(
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(5, 5, 10, 0),
+                                    child:Row(
+                                        children: [
+                                          Icon(
+                                            Icons.location_on,
+                                            color: kTextLightColor,
+                                          ),
+                                          Text(
+                                              "${restaurant.address.capitalizeFirstOfEach}",
+                                              style: TextStyle(
+                                                  color: kTextColor, fontWeight: FontWeight.normal),
+                                              textAlign: TextAlign.left),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
                                 Padding(
                                   padding: const EdgeInsets.fromLTRB(30, 5, 30, 0),
                                   child: Row(
@@ -118,11 +120,11 @@ class DetailScreen extends StatelessWidget {
                                 Padding(
                                   padding: const EdgeInsets.fromLTRB(20, 30, 20, 5),
                                   child: ExpandablePanel(
-                                    header: Text(AppLocalizations.of(context).translate("description").toUpperCase()),
-                                    collapsed: Text(restaurant.description, softWrap: true, maxLines: 2, overflow: TextOverflow.ellipsis,),
-                                    expanded: Text(restaurant.description, softWrap: true, ),
-                                  ),
-                                )
+                                        header: Text(AppLocalizations.of(context).translate("description").toUpperCase()),
+                                        collapsed: Text(restaurant.description, softWrap: true, maxLines: 2, overflow: TextOverflow.ellipsis,),
+                                        expanded: Text(restaurant.description, softWrap: true, ),
+                                      ),
+                                ),
                               ],
                             ),
                           ),
@@ -130,6 +132,20 @@ class DetailScreen extends StatelessWidget {
                     )
                   );
                 },
+              ),
+              Positioned(
+                right: 20,
+                bottom: 20,
+                child: FloatingActionButton.extended(
+                  backgroundColor: kPrimaryColor,
+                  onPressed: () => print('book!'),
+                  label: Row(
+                    children: [
+                      Text(AppLocalizations.of(context).translate("book_now").toUpperCase()),
+                      Icon(LineIcons.angleRight)
+                    ],
+                  ),
+                ),
               )
             ],
           )

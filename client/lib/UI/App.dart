@@ -1,5 +1,5 @@
 import 'package:client/UI/behaviors/app_localizations.dart';
-import 'package:client/UI/screens/home/home_screen.dart';
+import 'package:client/UI/home.dart';
 import 'package:client/UI/support/constants.dart';
 import 'package:client/UI/support/theme.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +12,7 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: APP_NAME,
       theme: theme(),
-      home: HomeScreen(),
+      home: Home(),
       localizationsDelegates: [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
