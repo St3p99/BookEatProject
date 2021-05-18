@@ -9,16 +9,12 @@ class Body extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(height: getProportionateScreenWidth(10)),
-            HomeHeader(),
-            SizedBox(height: getProportionateScreenWidth(10)),
-            RestaurantsInArea(),
-            // SizedBox(height: getProportionateScreenWidth(30)),
-          ],
-        ),
+        children: <Widget>[
+          HomeHeader(),
+          RestaurantsInArea(),
+          // SizedBox(height: getProportionateScreenWidth(30)),
+        ],
+      ),
     );
   }
 }

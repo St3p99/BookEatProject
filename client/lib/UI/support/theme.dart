@@ -5,8 +5,7 @@ import 'constants.dart';
 ThemeData theme() {
   return ThemeData(
     scaffoldBackgroundColor: Colors.white,
-    fontFamily: "Muli",
-    textTheme: textTheme(),
+    fontFamily: 'Oswald',
     inputDecorationTheme: inputDecorationTheme(),
     visualDensity: VisualDensity.adaptivePlatformDensity,
   );
@@ -29,17 +28,3 @@ InputDecorationTheme inputDecorationTheme() {
     border: outlineInputBorder,
   );
 }
-
-TextTheme textTheme() {
-  return TextTheme(
-    bodyText1: TextStyle(
-      color: kTextColor,
-      fontWeight: FontWeight.w600
-    ),
-    bodyText2: TextStyle(
-        color: kTextColor,
-        fontWeight: FontWeight.w400
-    ),
-  );
-}
-

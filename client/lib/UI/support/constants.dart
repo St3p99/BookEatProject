@@ -8,8 +8,7 @@ const kPrimaryLightColor = Colors.white;
 const kPrimaryGradientColor = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF1EE98B), Color(0xFF0898F1)]
-); // LinearGradient
+    colors: [Color(0xFF1EE98B), Color(0xFF0898F1)]); // LinearGradient
 const kSecondaryColor = Colors.grey;
 const kTextLightColor = Colors.black54;
 const kTextColor = Colors.black87;

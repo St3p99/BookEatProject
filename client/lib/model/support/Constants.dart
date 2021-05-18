@@ -1,7 +1,6 @@
 // addresses
 const String ADDRESS_STORE_SERVER = "http://localhost:8080/api/";
-const String ADDRESS_AUTHENTICATION_SERVER =
-    "http://localhost:8081/auth";
+const String ADDRESS_AUTHENTICATION_SERVER = "http://localhost:8081/auth";
 
 // authentication
 const String REALM = "BookIT-Realm";
@@ -25,4 +24,3 @@ const String RESPONSE_ERROR_MAIL_USER_ALREADY_EXISTS =
 
 // messages
 const String MESSAGE_CONNECTION_ERROR = "connection_error";
-
