@@ -3,6 +3,7 @@ package unical.dimes.psw2021.server.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import unical.dimes.psw2021.server.model.Reservation;
 import unical.dimes.psw2021.server.model.Review;
@@ -31,7 +32,7 @@ public class UserService {
         this.reservationRepository = reservationRepository;
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED)
     public User addUser(User user) throws UniqueKeyViolationException {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new UniqueKeyViolationException();
@@ -78,10 +79,8 @@ public class UserService {
         reservationRepository.delete(opt.get());
     }
 
-    @Transactional
-    public void deleteUser(Long id) {
-        Optional<User> opt = userRepository.findById(id);
-        if (opt.isEmpty()) return;
-        userRepository.delete(opt.get());
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteUser(User user) {
+        userRepository.delete(user);
     }
 }

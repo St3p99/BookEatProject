@@ -53,14 +53,14 @@ false Africa/Blantyre
 false Africa/Brazzaville
 false Africa/Bujumbura
 false Africa/Cairo
-true Africa/Casablanca
+false Africa/Casablanca
 true Africa/Ceuta
 false Africa/Conakry
 false Africa/Dakar
 false Africa/Dar_es_Salaam
 false Africa/Djibouti
 false Africa/Douala
-true Africa/El_Aaiun
+false Africa/El_Aaiun
 false Africa/Freetown
 false Africa/Gaborone
 false Africa/Harare
@@ -792,7 +792,7 @@ false YEKT
 false Z
 false Zulu
 </TimeZones>
-      <StartupTime>1620815438</StartupTime>
+      <StartupTime>1621606380</StartupTime>
     </root>
     <database id="2" parent="1" name="bsdb">
       <ObjectId>58181</ObjectId>
@@ -807,7 +807,7 @@ false Zulu
 13158||-9223372036854775808|U|G
 13158||10|U|G</Grants>
       <Owner>postgres</Owner>
-      <IntrospectionStateNumber>9894</IntrospectionStateNumber>
+      <IntrospectionStateNumber>9955</IntrospectionStateNumber>
       <Current>1</Current>
       <Relations>sequence|table|67563|67565|1
 sequence|table|67479|67481|1
@@ -874,7 +874,7 @@ sequence|table|67498|67500|1
       <ObjectId>65971</ObjectId>
       <StateNumber>8208</StateNumber>
       <Owner>postgres</Owner>
-      <IntrospectionStateNumber>9895</IntrospectionStateNumber>
+      <IntrospectionStateNumber>9956</IntrospectionStateNumber>
     </schema>
     <schema id="17" parent="2" name="information_schema">
       <ObjectId>13158</ObjectId>
@@ -892,7 +892,6 @@ sequence|table|67498|67500|1
       <Comment>standard public schema</Comment>
       <StateNumber>287</StateNumber>
       <Owner>postgres</Owner>
-      <IntrospectionStateNumber>9794</IntrospectionStateNumber>
       <Current>1</Current>
     </schema>
     <extension id="20" parent="2" name="plpgsql">
@@ -1036,7 +1035,7 @@ sequence|table|67498|67500|1
     <table id="39" parent="16" name="restaurant">
       <ObjectId>67481</ObjectId>
       <Owner>postgres</Owner>
-      <StateNumber>9850</StateNumber>
+      <StateNumber>9919</StateNumber>
     </table>
     <table id="40" parent="16" name="review">
       <ObjectId>67565</ObjectId>
@@ -1056,7 +1055,7 @@ sequence|table|67498|67500|1
     <table id="43" parent="16" name="user">
       <ObjectId>67500</ObjectId>
       <Owner>postgres</Owner>
-      <StateNumber>9150</StateNumber>
+      <StateNumber>9950</StateNumber>
     </table>
     <column id="44" parent="38" name="id">
       <Position>1</Position>
@@ -1112,26 +1111,20 @@ sequence|table|67498|67500|1
       <StateNumber>9145</StateNumber>
       <TypeId>20</TypeId>
     </column>
-    <column id="52" parent="38" name="notes">
-      <Position>9</Position>
-      <DataType>text|0s</DataType>
-      <StateNumber>9152</StateNumber>
-      <TypeId>25</TypeId>
-    </column>
-    <column id="53" parent="38" name="is_rejected">
+    <column id="52" parent="38" name="is_rejected">
       <Position>10</Position>
       <DataType>boolean|0s</DataType>
       <StateNumber>9855</StateNumber>
       <TypeId>16</TypeId>
     </column>
-    <column id="54" parent="38" name="rejected">
+    <column id="53" parent="38" name="rejected">
       <Position>11</Position>
       <DataType>boolean|0s</DataType>
       <NotNull>1</NotNull>
       <StateNumber>9867</StateNumber>
       <TypeId>16</TypeId>
     </column>
-    <index id="55" parent="38" name="reservation_pk">
+    <index id="54" parent="38" name="reservation_pk">
       <ObjectId>67533</ObjectId>
       <StateNumber>9135</StateNumber>
       <ColNames>id</ColNames>
@@ -1141,7 +1134,7 @@ sequence|table|67498|67500|1
       <CollationIds>0</CollationIds>
       <ClassIds>3124</ClassIds>
     </index>
-    <index id="56" parent="38" name="reservation_customer_id_restaurant_id_booking_timestamp_unique">
+    <index id="55" parent="38" name="reservation_customer_id_restaurant_id_booking_timestamp_unique">
       <ObjectId>67535</ObjectId>
       <StateNumber>9147</StateNumber>
       <ColNames>customer_id
@@ -1153,14 +1146,14 @@ start_time</ColNames>
       <CollationIds>0,0,0,0</CollationIds>
       <ClassIds>3124,3124,3122,10037</ClassIds>
     </index>
-    <key id="57" parent="38" name="reservation_pk">
+    <key id="56" parent="38" name="reservation_pk">
       <ObjectId>67534</ObjectId>
       <StateNumber>9135</StateNumber>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
       <UnderlyingIndexName>reservation_pk</UnderlyingIndexName>
     </key>
-    <key id="58" parent="38" name="reservation_customer_id_restaurant_id_booking_timestamp_unique">
+    <key id="57" parent="38" name="reservation_customer_id_restaurant_id_booking_timestamp_unique">
       <ObjectId>67536</ObjectId>
       <StateNumber>9147</StateNumber>
       <ColNames>customer_id
@@ -1169,7 +1162,7 @@ reservation_date
 start_time</ColNames>
       <UnderlyingIndexName>reservation_customer_id_restaurant_id_booking_timestamp_unique</UnderlyingIndexName>
     </key>
-    <foreign-key id="59" parent="38" name="FKpco9nxs2j4sj5wvtxrg860uu2">
+    <foreign-key id="58" parent="38" name="FKpco9nxs2j4sj5wvtxrg860uu2">
       <ObjectId>67537</ObjectId>
       <StateNumber>9148</StateNumber>
       <ColNames>restaurant_id</ColNames>
@@ -1180,7 +1173,7 @@ start_time</ColNames>
       <RefColNames>id</RefColNames>
       <OnDelete>cascade</OnDelete>
     </foreign-key>
-    <foreign-key id="60" parent="38" name="FKrcuslvs8tr6t0hwcp6mnmjd32">
+    <foreign-key id="59" parent="38" name="FKrcuslvs8tr6t0hwcp6mnmjd32">
       <ObjectId>67542</ObjectId>
       <StateNumber>9149</StateNumber>
       <ColNames>table_service_id</ColNames>
@@ -1191,7 +1184,7 @@ start_time</ColNames>
       <RefColNames>id</RefColNames>
       <OnDelete>cascade</OnDelete>
     </foreign-key>
-    <foreign-key id="61" parent="38" name="FKr3j409g23sdjr7cmcb8bqtfen">
+    <foreign-key id="60" parent="38" name="FKr3j409g23sdjr7cmcb8bqtfen">
       <ObjectId>67547</ObjectId>
       <StateNumber>9150</StateNumber>
       <ColNames>customer_id</ColNames>
@@ -1201,7 +1194,7 @@ start_time</ColNames>
       <RefKeyName>user_pkey</RefKeyName>
       <RefColNames>id</RefColNames>
     </foreign-key>
-    <column id="62" parent="39" name="id">
+    <column id="61" parent="39" name="id">
       <Position>1</Position>
       <DataType>bigint|0s</DataType>
       <NotNull>1</NotNull>
@@ -1209,58 +1202,64 @@ start_time</ColNames>
       <DefaultExpression>nextval(&apos;booking_system.restaurant_id_seq1&apos;::regclass)</DefaultExpression>
       <TypeId>20</TypeId>
     </column>
-    <column id="63" parent="39" name="address">
+    <column id="62" parent="39" name="address">
       <Position>2</Position>
       <DataType>varchar(50)|0s</DataType>
       <NotNull>1</NotNull>
       <StateNumber>9114</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="64" parent="39" name="city">
+    <column id="63" parent="39" name="city">
       <Position>3</Position>
       <DataType>varchar(30)|0s</DataType>
       <NotNull>1</NotNull>
       <StateNumber>9114</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="65" parent="39" name="name">
+    <column id="64" parent="39" name="name">
       <Position>5</Position>
       <DataType>varchar(255)|0s</DataType>
       <NotNull>1</NotNull>
       <StateNumber>9114</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="66" parent="39" name="private_mail">
+    <column id="65" parent="39" name="private_mail">
       <Position>6</Position>
       <DataType>varchar(255)|0s</DataType>
       <NotNull>1</NotNull>
       <StateNumber>9114</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="67" parent="39" name="public_mail">
+    <column id="66" parent="39" name="public_mail">
       <Position>8</Position>
       <DataType>varchar(255)|0s</DataType>
       <StateNumber>9114</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="68" parent="39" name="public_phone">
+    <column id="67" parent="39" name="public_phone">
       <Position>9</Position>
       <DataType>varchar(255)|0s</DataType>
       <StateNumber>9114</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="69" parent="39" name="seating_capacity">
+    <column id="68" parent="39" name="seating_capacity">
       <Position>10</Position>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
       <StateNumber>9114</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="70" parent="39" name="category">
+    <column id="69" parent="39" name="category">
       <Position>12</Position>
       <DataType>varchar(255)|0s</DataType>
       <StateNumber>9850</StateNumber>
       <TypeId>1043</TypeId>
+    </column>
+    <column id="70" parent="39" name="description">
+      <Position>13</Position>
+      <DataType>text|0s</DataType>
+      <StateNumber>9923</StateNumber>
+      <TypeId>25</TypeId>
     </column>
     <index id="71" parent="39" name="restaurant_pkey">
       <ObjectId>67488</ObjectId>
@@ -1558,7 +1557,14 @@ service_name</ColNames>
       <StateNumber>9116</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="109" parent="43" name="user_pkey">
+    <column id="109" parent="43" name="city">
+      <Position>6</Position>
+      <DataType>varchar(100)|0s</DataType>
+      <NotNull>1</NotNull>
+      <StateNumber>9954</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <index id="110" parent="43" name="user_pkey">
       <ObjectId>67504</ObjectId>
       <StateNumber>9116</StateNumber>
       <ColNames>id</ColNames>
@@ -1568,7 +1574,7 @@ service_name</ColNames>
       <CollationIds>0</CollationIds>
       <ClassIds>3124</ClassIds>
     </index>
-    <index id="110" parent="43" name="user_email_unique">
+    <index id="111" parent="43" name="user_email_unique">
       <ObjectId>67510</ObjectId>
       <StateNumber>9119</StateNumber>
       <ColNames>email</ColNames>
@@ -1578,14 +1584,14 @@ service_name</ColNames>
       <CollationNames>default</CollationNames>
       <ClassIds>3126</ClassIds>
     </index>
-    <key id="111" parent="43" name="user_pkey">
+    <key id="112" parent="43" name="user_pkey">
       <ObjectId>67505</ObjectId>
       <StateNumber>9116</StateNumber>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
       <UnderlyingIndexName>user_pkey</UnderlyingIndexName>
     </key>
-    <key id="112" parent="43" name="user_email_unique">
+    <key id="113" parent="43" name="user_email_unique">
       <ObjectId>67511</ObjectId>
       <StateNumber>9119</StateNumber>
       <ColNames>email</ColNames>

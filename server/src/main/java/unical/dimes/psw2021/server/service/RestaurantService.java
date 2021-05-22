@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import unical.dimes.psw2021.server.model.Reservation;
 import unical.dimes.psw2021.server.model.Restaurant;
+import unical.dimes.psw2021.server.model.Review;
 import unical.dimes.psw2021.server.model.TableService;
 import unical.dimes.psw2021.server.repository.ReservationRepository;
 import unical.dimes.psw2021.server.repository.RestaurantRepository;
+import unical.dimes.psw2021.server.repository.ReviewRepository;
 import unical.dimes.psw2021.server.repository.TableServiceRepository;
 import unical.dimes.psw2021.server.support.exception.TableServiceOverlapException;
 import unical.dimes.psw2021.server.support.exception.UniqueKeyViolationException;
@@ -26,15 +28,17 @@ public class RestaurantService {
     private final RestaurantRepository restaurantRepository;
     private final TableServiceRepository tableServiceRepository;
     private final ReservationRepository reservationRepository;
+    private final ReviewRepository reviewRepository;
 
 
     @Autowired
     public RestaurantService(RestaurantRepository restaurantRepository,
                              TableServiceRepository tableServiceRepository,
-                             ReservationRepository reservationRepository) {
+                             ReservationRepository reservationRepository, ReviewRepository reviewRepository) {
         this.restaurantRepository = restaurantRepository;
         this.tableServiceRepository = tableServiceRepository;
         this.reservationRepository = reservationRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     @Transactional(readOnly = true)
@@ -47,11 +51,17 @@ public class RestaurantService {
     }
 
     @Transactional(readOnly = true)
-    public List<Restaurant> showRestaurantByCity(String city, int pageNumber, int pageSize, String sortBy) {
+    public List<Restaurant> showRestaurantPagedByCity(String city, int pageNumber, int pageSize, String sortBy) {
 
         Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy));
         Page<Restaurant> pagedResult = restaurantRepository.findByCityIgnoreCase(city, paging);
         return pagedResult.hasContent() ? pagedResult.getContent() : new ArrayList<>();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Restaurant> showRestaurantByCity(String city) {
+
+        return restaurantRepository.findByCityIgnoreCase(city);
     }
 
     @Transactional
@@ -66,10 +76,7 @@ public class RestaurantService {
     }
 
     @Transactional
-    public void deleteRestaurant(Long id) {
-        Optional<Restaurant> opt = restaurantRepository.findById(id);
-        if (opt.isEmpty()) return;
-        Restaurant r = opt.get();
+    public void deleteRestaurant(Restaurant r) {
         tableServiceRepository.deleteAll(r.getTableServices());
         restaurantRepository.delete(r);
     }
@@ -180,5 +187,13 @@ public class RestaurantService {
         Reservation reservation = opt.get();
         reservation.setRejected(true);
         reservationRepository.save(reservation);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Review> showReview(Long id) {
+        Optional<Restaurant> opt = restaurantRepository.findById(id);
+        if (opt.isEmpty()) throw new ResourceNotFoundException();
+
+        return reviewRepository.findReviewByReservation(opt.get());
     }
 }

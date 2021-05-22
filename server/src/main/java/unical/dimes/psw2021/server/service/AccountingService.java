@@ -1,5 +1,6 @@
 package unical.dimes.psw2021.server.service;
 
+import com.sun.mail.iap.ConnectionException;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,15 +15,19 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 import unical.dimes.psw2021.server.model.Restaurant;
 import unical.dimes.psw2021.server.model.User;
 import unical.dimes.psw2021.server.repository.RestaurantRepository;
 import unical.dimes.psw2021.server.repository.UserRepository;
+import unical.dimes.psw2021.server.support.exception.UniqueKeyViolationException;
 
 import javax.ws.rs.core.Response;
+import java.net.ConnectException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
@@ -31,6 +36,8 @@ import java.util.Optional;
 public class AccountingService {
     private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
+    private final RestaurantService restaurantService;
+    private final UserService userService;
 
     @Value("${keycloak.auth-server-url}") private String serverUrl;
     @Value("${admin.username.keycloak}") private String adminUsername;
@@ -44,14 +51,16 @@ public class AccountingService {
 
 
     @Autowired
-    public AccountingService(UserRepository userRepository, RestaurantRepository restaurantRepository) {
+    public AccountingService(UserRepository userRepository, RestaurantRepository restaurantRepository, RestaurantService restaurantService, UserService userService) {
         this.userRepository = userRepository;
         this.restaurantRepository = restaurantRepository;
+        this.restaurantService = restaurantService;
+        this.userService = userService;
     }
 
 
-    @Transactional(readOnly = true)
-    public void registerUser(User user, String pwd){
+    @Transactional
+    public User registerUser(User user, String pwd) throws UniqueKeyViolationException, ConnectException{
         Keycloak keycloak = getKeycloakObj();
 
         // Define user
@@ -92,10 +101,13 @@ public class AccountingService {
         // Send password reset E-Mail
         // VERIFY_EMAIL, UPDATE_PROFILE, CONFIGURE_TOTP, UPDATE_PASSWORD, TERMS_AND_CONDITIONS
 //      usersResource.get(userId).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
+
+        return userService.addUser(user);
     }
 
-    @Transactional(readOnly = true)
-    public void registerRestaurantManager(Restaurant restaurant, String pwd){
+    @Transactional
+    public Restaurant registerRestaurant(Restaurant restaurant, String pwd) throws UniqueKeyViolationException, ConnectException {
+
         Keycloak keycloak = getKeycloakObj();
 
         // Define user
@@ -111,6 +123,7 @@ public class AccountingService {
 
         // Create user (requires manage-users role)
         Response response = usersResource.create(userRepresentation);
+
         String userId = CreatedResponseUtil.getCreatedId(response);
 
         // Define password credential
@@ -132,9 +145,11 @@ public class AccountingService {
         RoleRepresentation userClientRole = realmResource.clients().get(app1Client.getId()).roles().get(RESTAURANT_MANAGER_ROLE).toRepresentation();
         // Assign client level role to user
         userResource.roles().clientLevel(app1Client.getId()).add(Arrays.asList(userClientRole));
+
+        return restaurantService.addRestaurant(restaurant);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public void deleteUser(Long id) {
         Optional<User> opt = userRepository.findById(id);
         if (opt.isEmpty()) return;
@@ -150,10 +165,12 @@ public class AccountingService {
         usersResource.delete(
                 usersResource.search(user.getEmail(), true).get(0).getId()
         );
+
+        userService.deleteUser(user);
     }
 
-    @Transactional(readOnly = true)
-    public void deleteRestaurantManager(Long id) {
+    @Transactional
+    public void deleteRestaurant(Long id){
         Optional<Restaurant> opt = restaurantRepository.findById(id);
         if (opt.isEmpty()) return;
         Restaurant r = opt.get();
@@ -168,6 +185,8 @@ public class AccountingService {
         usersResource.delete(
                 usersResource.search(r.getPrivateMail(), true).get(0).getId()
         );
+
+        restaurantService.deleteRestaurant(r);
     }
 
     @Transactional(propagation = Propagation.SUPPORTS )

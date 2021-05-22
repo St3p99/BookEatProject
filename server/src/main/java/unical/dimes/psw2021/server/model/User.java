@@ -51,6 +51,10 @@ public class User {
     @Column(name = "email", nullable = false, length = 50)
     private String email;
 
+    @NotBlank
+    @Column(name = "city", nullable = false, length = 100)
+    private String city;
+
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @JsonIgnore

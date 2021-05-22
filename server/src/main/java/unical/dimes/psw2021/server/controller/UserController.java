@@ -20,6 +20,7 @@ import unical.dimes.psw2021.server.support.exception.UniqueKeyViolationException
 
 import javax.validation.Valid;
 
+import java.net.ConnectException;
 import java.util.List;
 
 @RestController
@@ -45,13 +46,15 @@ public class UserController {
     public ResponseEntity newUser(@RequestBody @Valid User user, BindingResult bindingResult, @RequestParam(value = "pwd") String pwd) {
         if (bindingResult.hasErrors()) return ResponseEntity.badRequest().build();
         try {
-            User created = userService.addUser(user);
-            accountingService.registerUser(created, pwd);
             return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(created);
+                    .body(accountingService.registerUser(user, pwd));
         } catch (UniqueKeyViolationException e) {
             return new ResponseEntity<>(new ResponseMessage("ERROR_MAIL_USER_ALREADY_EXISTS"), HttpStatus.CONFLICT);
+        }catch (ConnectException e ){
+            return new ResponseEntity<>(
+                    new ResponseMessage("ERROR_CONNECTION"),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -106,7 +109,6 @@ public class UserController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity deleteUser(@PathVariable Long id){
         accountingService.deleteUser(id);
-        userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 

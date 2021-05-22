@@ -47,11 +47,11 @@ public class Restaurant {
     private String category;
 
     @NotBlank
-    @Column(name = "city", nullable = false, length = 30)
+    @Column(name = "city", nullable = false, length = 100)
     private String city;
 
     @NotBlank
-    @Column(name = "address", nullable = false, length = 50)
+    @Column(name = "address", nullable = false, length = 100)
     private String address;
 
     @NotBlank
@@ -67,6 +67,10 @@ public class Restaurant {
     @Email
     @Column(name = "public_mail")
     private String publicMail;
+
+    @Basic
+    @Column(name = "description")
+    private String description;
 
     @NotNull
     @Positive

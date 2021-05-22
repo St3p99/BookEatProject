@@ -63,10 +63,6 @@ public class Reservation {
     private int nGuests;
 
     @Basic
-    @Column(name = "notes", columnDefinition = "TEXT")
-    private String notes;
-
-    @Basic
     @Column(name = "rejected", nullable = false)
     private boolean rejected = false; // default: false
 

@@ -1,5 +1,6 @@
 package unical.dimes.psw2021.server.controller;
 
+import com.sun.mail.iap.ConnectionException;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -17,6 +18,7 @@ import unical.dimes.psw2021.server.support.ResponseMessage;
 import unical.dimes.psw2021.server.support.exception.TableServiceOverlapException;
 import unical.dimes.psw2021.server.support.exception.UniqueKeyViolationException;
 import javax.validation.Valid;
+import java.net.ConnectException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -41,15 +43,17 @@ public class RestaurantController {
     public ResponseEntity newRestaurant(@RequestBody @Valid Restaurant restaurant, BindingResult bindingResult, @RequestParam(value = "pwd") String pwd) {
         if (bindingResult.hasErrors()) return ResponseEntity.badRequest().build();
         try {
-            Restaurant created = restaurantService.addRestaurant(restaurant);
-            accountingService.registerRestaurantManager(created, pwd);
             return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(created);
+                    .body(accountingService.registerRestaurant(restaurant, pwd));
         } catch (UniqueKeyViolationException e) {
             return new ResponseEntity<>(
                     new ResponseMessage("ERROR_RESTAURANT_ALREADY_EXIST"),
                     HttpStatus.CONFLICT);
+        }catch (ConnectException e ){
+            return new ResponseEntity<>(
+                    new ResponseMessage("ERROR_CONNECTION"),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }//newRestaurant
 
@@ -129,8 +133,7 @@ public class RestaurantController {
     @Operation(method = "deleteRestaurant", summary = "Delete restaurant")
     @DeleteMapping(path = "/delete/{id}")
     public ResponseEntity deleteRestaurant(@PathVariable Long id) {
-        accountingService.deleteRestaurantManager(id);
-        restaurantService.deleteRestaurant(id);
+        accountingService.deleteRestaurant(id);
         return ResponseEntity.noContent().build();
     }
 
