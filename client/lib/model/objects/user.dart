@@ -4,6 +4,7 @@ class User {
  String lastName;
  String phone;
  String email;
+ String city;
 
 
   User({

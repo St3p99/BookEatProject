@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class TableService {
   int id;
   String serviceName;
-  Set<String> daysOfWeek;
+  List<dynamic> daysOfWeek;
   String startTime;
   String endTime;
   int avgMealDuration;
@@ -29,7 +29,7 @@ class TableService {
       startTime: json['startTime'],
       endTime: json['endTime'],
       avgMealDuration: json['avgMealDuration'],
-      restaurant: json['restaurant'],
+      restaurant: json['restaurant'] == null ? null : Restaurant.fromJson(json["restaurant"]),
     );
   }
 
@@ -41,7 +41,7 @@ class TableService {
         'daysOfWeek': daysOfWeek,
         'endTime': endTime,
         'avgMealDuration': avgMealDuration,
-        'restaurant': restaurant,
+        'restaurant': restaurant == null ? null : restaurant.toJson(),
       };
 
   @override

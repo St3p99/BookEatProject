@@ -3,10 +3,10 @@ import 'package:client/model/objects/user.dart';
 
 class Review {
   int id;
-  String foodRating;
-  String serviceRating;
-  String locationRating;
-  // String reviewText;
+  int foodRating;
+  int serviceRating;
+  int locationRating;
+  String reviewText;
   Reservation reservation;
   User user;
 
@@ -16,6 +16,7 @@ class Review {
     this.foodRating,
     this.serviceRating,
     this.locationRating,
+    this.reviewText,
     this.reservation,
     this.user
   });
@@ -26,8 +27,9 @@ class Review {
       foodRating: json['foodRating'],
       serviceRating: json['serviceRating'],
       locationRating: json['locationRating'],
-      reservation: json['reservation'],
-      user: json['user'],
+      reviewText: json['reviewText'],
+      reservation: json['reservation'] == null ? null : Reservation.fromJson(json["reservation"]),
+      user: json['user'] == null ? null : User.fromJson(json["user"]),
     );
   }
 
@@ -36,12 +38,13 @@ class Review {
     'foodRating': foodRating,
     'serviceRating': serviceRating,
     'locationRating': locationRating,
-    'reservation': reservation,
-    'user': user,
+    'reviewText': reviewText,
+    'reservation': reservation == null ? null : reservation.toJson(),
+    'user': user == null ? null : user.toJson(),
   };
 
   @override
   String toString() {
-    return 'Review{id: $id, foodRating: $foodRating, serviceRating: $serviceRating, locationRating: $locationRating, reservation: $reservation, user: $user}';
+    return 'Review{id: $id, foodRating: $foodRating, serviceRating: $serviceRating, locationRating: $locationRating, reviewText: $reviewText, reservation: $reservation, user: $user}';
   }
 }

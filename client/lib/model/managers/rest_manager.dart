@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:client/model/support/Constants.dart';
 import 'package:client/model/support/error_listener.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
 enum TypeHeader { json, urlencoded }
@@ -11,14 +12,14 @@ class RestManager {
   ErrorListener delegate;
   String token;
 
-  Future<String> _makeRequest(
-      String serverAddress, String servicePath, String method, TypeHeader type,
-      {Map<String, String> value, dynamic body}) async {
+  Future<Response> _makeRequest(String serverAddress, String servicePath, String method, TypeHeader type, {Map<String, String> value, dynamic body}) async {
+    //TODO: CHANGE TO HTTPS IN FUTURE
     Uri uri = Uri.https(serverAddress, servicePath, value);
     bool errorOccurred = false;
     while (true) {
+      print(uri.toString());
       try {
-        var response;
+        Response response;
         // setting content type
         String contentType;
         dynamic formattedBody;
@@ -47,7 +48,7 @@ class RestManager {
           case "get":
             response = await get(
               uri,
-              headers: headers,
+              // headers: headers,
             );
             break;
           case "put":
@@ -64,11 +65,13 @@ class RestManager {
             break;
         }
         if (delegate != null && errorOccurred) {
+          print("NETWORK GONE");
           delegate.errorNetworkGone();
           errorOccurred = false;
         }
-        return response.body;
+        return response;
       } catch (err) {
+        print(err);
         if (delegate != null && !errorOccurred) {
           delegate.errorNetworkOccurred(MESSAGE_CONNECTION_ERROR);
           errorOccurred = true;
@@ -79,23 +82,23 @@ class RestManager {
     }
   }
 
-  Future<String> makePostRequest(
+  Future<Response> makePostRequest(
       String serverAddress, String servicePath, dynamic value,
       {TypeHeader type = TypeHeader.json}) async {
     return _makeRequest(serverAddress, servicePath, "post", type, body: value);
   }
 
-  Future<String> makeGetRequest(String serverAddress, String servicePath,
+  Future<Response> makeGetRequest(String serverAddress, String servicePath,
       [Map<String, String> value, TypeHeader type]) async {
     return _makeRequest(serverAddress, servicePath, "get", type, value: value);
   }
 
-  Future<String> makePutRequest(String serverAddress, String servicePath,
+  Future<Response> makePutRequest(String serverAddress, String servicePath,
       [Map<String, String> value, TypeHeader type]) async {
     return _makeRequest(serverAddress, servicePath, "put", type, value: value);
   }
 
-  Future<String> makeDeleteRequest(String serverAddress, String servicePath,
+  Future<Response> makeDeleteRequest(String serverAddress, String servicePath,
       [Map<String, String> value, TypeHeader type]) async {
     return _makeRequest(serverAddress, servicePath, "delete", type,
         value: value);

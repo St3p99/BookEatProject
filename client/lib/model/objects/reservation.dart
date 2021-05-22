@@ -7,7 +7,6 @@ class Reservation {
   String date;
   String startTime;
   int nGuests;
-  String notes;
   bool rejected;
   User user;
   Restaurant restaurant;
@@ -18,7 +17,6 @@ class Reservation {
         this.date,
         this.startTime,
         this.nGuests,
-        this.notes,
         this.rejected,
         this.user,
         this.restaurant,
@@ -30,12 +28,11 @@ class Reservation {
       id: json['id'],
       date: json['date'],
       startTime: json['startTime'],
-      notes: json['notes'],
       nGuests: json['nGuests'],
       rejected: json['rejected'],
-      user: json['user'],
-      restaurant: json['restaurant'],
-      tableService: json['tableService'],
+      user: json['user'] == null ? null : User.fromJson(json["user"]),
+      restaurant: json['restaurant'] == null ? null : Restaurant.fromJson(json["restaurant"]),
+      tableService: json['tableService'] == null ? null : TableService.fromJson(json["tableService"]),
     );
   }
 
@@ -44,15 +41,14 @@ class Reservation {
     'date': date,
     'startTime': startTime,
     'nGuests': nGuests,
-    'notes': notes,
     'rejected': rejected,
     'user': user,
-    'restaurant': restaurant,
-    'tableService': tableService,
+    'restaurant': restaurant == null ? null : restaurant.toJson(),
+    'tableService': tableService == null ? null : tableService.toJson(),
   };
 
   @override
   String toString() {
-    return 'Reservation{id: $id, date: $date, startTime: $startTime, nGuests: $nGuests, notes: $notes, rejected: $rejected, user: $user, restaurant: $restaurant, tableService: $tableService}';
+    return 'Reservation{id: $id, date: $date, startTime: $startTime, nGuests: $nGuests, rejected: $rejected, user: $user, restaurant: $restaurant, tableService: $tableService}';
   }
 }

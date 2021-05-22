@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 const String APP_VERSION = "0.0.1";
 const String APP_NAME = "BookIT";
 
-const kPrimaryColor = Color(0xFF25CBA1);
+// const kPrimaryColor = Color(0xFF25CBA1);
+const kPrimaryColor = Color(0xBE25CBA1);
 const kPrimaryLightColor = Colors.white;
 const kPrimaryGradientColor = LinearGradient(
     begin: Alignment.topLeft,

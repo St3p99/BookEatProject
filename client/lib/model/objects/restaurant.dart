@@ -1,5 +1,5 @@
+import 'package:client/model/objects/review.dart';
 import 'package:client/model/objects/table_service.dart';
-import 'package:intl/intl.dart';
 
 class Restaurant {
   int id;
@@ -13,9 +13,9 @@ class Restaurant {
   String description;
   int seatingCapacity;
   int nReviews;
-  double avgFoodRating;
-  double avgServiceRating;
-  double avgLocationRating;
+  double avgFoodRating = -1;
+  double avgServiceRating = -1;
+  double avgLocationRating = -1;
 
   Restaurant(
       {this.id,
@@ -28,10 +28,10 @@ class Restaurant {
       this.privateMail,
       this.publicMail,
       this.seatingCapacity,
-      this.nReviews,
-      this.avgFoodRating,
-      this.avgServiceRating,
-      this.avgLocationRating,
+      this.nReviews=0,
+      this.avgFoodRating=-1,
+      this.avgServiceRating=-1,
+      this.avgLocationRating=-1,
       });
 
   factory Restaurant.fromJson(Map<String, dynamic> json) {
@@ -62,6 +62,21 @@ class Restaurant {
         'seatingCapacity': seatingCapacity,
       };
 
+  void setRatings(List<Review> reviews){
+    this.nReviews = reviews.length;
+    this.avgFoodRating = 0; this.avgServiceRating = 0; this.avgLocationRating = 0;
+    for( int i = 0; i < reviews.length; i++ ){
+      this.avgFoodRating += reviews[i].foodRating;
+      this.avgServiceRating += reviews[i].serviceRating;
+      this.avgLocationRating += reviews[i].locationRating;
+    }
+    if(reviews.length != 0){
+      this.avgFoodRating = this.avgFoodRating/reviews.length;
+      this.avgServiceRating = this.avgFoodRating/reviews.length;
+      this.avgFoodRating = this.avgFoodRating/reviews.length;
+    }
+  }
+
   @override
   String toString() {
     return name;
@@ -82,18 +97,69 @@ Restaurant pizzAmore = new Restaurant(
     avgFoodRating: 4.3
 );
 
-List<TableService> tableServicesPizzaAmore = [
+List<TableService> tableServicesTest = [
   new TableService(
     serviceName: "pranzo",
-    daysOfWeek: {
+    daysOfWeek: [
       'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY',
-    },
+    ],
     startTime: "12:00:00",
     endTime: "14:30:00",
-
-  )
-
+    avgMealDuration: 60,
+    restaurant: pizzAmore
+  ),
+  new TableService(
+      serviceName: "cena",
+      daysOfWeek: [
+        'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY',
+      ],
+      startTime: "19:00:00",
+      endTime: "22:30:00",
+      avgMealDuration: 90,
+      restaurant: pizzAmore
+  ),
+  new TableService(
+      serviceName: "pranzo",
+      daysOfWeek: [
+        'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY',
+      ],
+      startTime: "12:00:00",
+      endTime: "14:30:00",
+      avgMealDuration: 60,
+      restaurant: pizzAmore
+  ),
+  new TableService(
+      serviceName: "cena",
+      daysOfWeek: [
+        'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY',
+      ],
+      startTime: "19:00:00",
+      endTime: "22:30:00",
+      avgMealDuration: 90,
+      restaurant: pizzAmore
+  ),  new TableService(
+      serviceName: "pranzo",
+      daysOfWeek: [
+        'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY',
+      ],
+      startTime: "12:00:00",
+      endTime: "14:30:00",
+      avgMealDuration: 60,
+      restaurant: pizzAmore
+  ),
+  new TableService(
+      serviceName: "cena",
+      daysOfWeek: [
+        'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY',
+      ],
+      startTime: "19:00:00",
+      endTime: "22:30:00",
+      avgMealDuration: 90,
+      restaurant: pizzAmore
+  ),
 ];
+
+List<String> times = ["12:00:00", "12:30:00", "13:00:00", "13:30:00", "14:00:00", "14:30:00"];
 
 
 Restaurant accademia = new Restaurant(
@@ -108,6 +174,7 @@ Restaurant accademia = new Restaurant(
     avgLocationRating: 4.1,
     avgFoodRating: 3.3
 );
+
 
 Restaurant nuSushi = new Restaurant(
     name: "Nu sushi",

@@ -1,18 +1,39 @@
 import 'package:client/UI/behaviors/app_localizations.dart';
 import 'package:client/UI/home.dart';
+import 'package:client/UI/screens/login/login_screen.dart';
 import 'package:client/UI/support/constants.dart';
 import 'package:client/UI/support/theme.dart';
+import 'package:client/model/support/login_result.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
+  App({Key key}) : super(key: key);
+
+  @override
+  _AppState createState() => _AppState();
+}
+class _AppState extends State<App> {
+  bool _logged = false;
+
+  @override
+  void initState() {
+    super.initState();
+    checkUserLoggedIn();
+  }
+
   @override
   Widget build(BuildContext context) {
+    WidgetsFlutterBinding.ensureInitialized();
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: APP_NAME,
       theme: theme(),
-      home: Home(),
+      home: _logged ? Home() : LoginScreen(),
       localizationsDelegates: [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -20,4 +41,12 @@ class App extends StatelessWidget {
       ],
     );
   }
+
+  Future<void> checkUserLoggedIn() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _logged = prefs.getString('token') != null;
+    });
+  }
+
 }

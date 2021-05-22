@@ -1,8 +1,8 @@
 import 'package:client/model/support/extensions/string_capitalization.dart';
 import 'package:client/UI/behaviors/app_localizations.dart';
 import 'package:client/UI/screens/discover/discover_screen.dart';
-import 'package:client/UI/screens/profile_screen.dart';
-import 'package:client/UI/screens/reservation_screen.dart';
+import 'package:client/UI/screens/profile/profile_screen.dart';
+import 'package:client/UI/screens/reservations/reservations_screen.dart';
 import 'package:client/UI/screens/search/search_screen.dart';
 import 'package:client/UI/support/constants.dart';
 import 'package:client/UI/support/size_config.dart';
@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
 
-import 'screens/detail_screen.dart';
+import 'screens/detail/detail_screen.dart';
 
 enum NavPage { home, search, reservation, profile }
 
@@ -26,8 +26,6 @@ class _HomeState extends State<Home> {
   PageController pageController = PageController();
   NavPage _selectedPage = NavPage.home;
 
-  }
-
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -35,7 +33,7 @@ class _HomeState extends State<Home> {
       body: PageView(
         children:[
           DiscoverScreen(pageController: pageController),
-          SearchScreen(), ReservationScreen(), ProfileScreen()
+          SearchScreen(), ReservationsScreen(), ProfileScreen()
         ],
         controller: pageController,
         onPageChanged: (page){
@@ -51,21 +49,21 @@ class _HomeState extends State<Home> {
   Widget CustomBottomNavBar() {
     return SafeArea(
       child: Container(
-        height: SizeConfig.screenHeight * 0.08,
+        height: SizeConfig.screenHeight * 0.06,
         decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.all(Radius.circular(100)),
             boxShadow: [
               BoxShadow(
                 blurRadius: 15,
-                spreadRadius: 10,
+                spreadRadius: 15,
                 color: Colors.black.withOpacity(0.4),
                 offset: Offset(0, 10),
               )
             ]
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
           child: GNav(
               hoverColor: kPrimaryColor.withOpacity(0.1),
               // tabActiveBorder: Border.all(color: kPrimaryColor, width: 1),
@@ -73,7 +71,7 @@ class _HomeState extends State<Home> {
               tabShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 15)], // tab button shadow
               curve: Curves.easeOutExpo,
               // tab animation curves
-              duration: Duration(milliseconds: 100),
+              duration: Duration(milliseconds: 500),
               // tab animation duration
               gap: 8,
               // the tab button gap between icon and text

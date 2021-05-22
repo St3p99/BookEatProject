@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class ReservationScreen extends StatelessWidget {
+class ReservationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
