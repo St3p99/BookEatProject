@@ -28,6 +28,11 @@ dependencies:
   cupertino_stepper: ^0.2.0
   pull_to_refresh: ^2.0.0
   shared_preferences: ^2.0.5
+  auto_size_text: ^2.1.0
+  email_validator: ^2.0.1
+  page_transition: ^2.0.2
+  flutter_google_places: ^0.2.8
+  google_place: ^0.3.3
 
 dev_dependencies:
   flutter_test:

@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:client/model/support/Constants.dart';
 import 'package:client/model/support/error_listener.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
 enum TypeHeader { json, urlencoded }
@@ -13,7 +12,6 @@ class RestManager {
   String token;
 
   Future<Response> _makeRequest(String serverAddress, String servicePath, String method, TypeHeader type, {Map<String, String> value, dynamic body}) async {
-    //TODO: CHANGE TO HTTPS IN FUTURE
     Uri uri = Uri.https(serverAddress, servicePath, value);
     bool errorOccurred = false;
     while (true) {
@@ -48,7 +46,7 @@ class RestManager {
           case "get":
             response = await get(
               uri,
-              // headers: headers,
+              headers: headers,
             );
             break;
           case "put":

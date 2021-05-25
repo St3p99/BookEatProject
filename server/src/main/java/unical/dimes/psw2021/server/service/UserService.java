@@ -83,4 +83,9 @@ public class UserService {
     public void deleteUser(User user) {
         userRepository.delete(user);
     }
+
+    public User getByEmail(String email) throws ResourceNotFoundException {
+        return userRepository.findByEmail(email).
+                orElseThrow(ResourceNotFoundException::new);
+    }
 }

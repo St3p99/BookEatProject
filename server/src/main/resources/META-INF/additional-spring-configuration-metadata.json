@@ -29,6 +29,11 @@
       "name": "default-average-meal-duration",
       "type": "java.lang.String",
       "description": "Description for default-average-meal-duration."
+    },
+    {
+      "name": "security.require-ssl",
+      "type": "java.lang.String",
+      "description": "Description for security.require-ssl."
     }
   ]
 }

@@ -1,6 +1,5 @@
 package unical.dimes.psw2021.server.service;
 
-import com.sun.mail.iap.ConnectionException;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,11 +14,9 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClientException;
 import unical.dimes.psw2021.server.model.Restaurant;
 import unical.dimes.psw2021.server.model.User;
 import unical.dimes.psw2021.server.repository.RestaurantRepository;

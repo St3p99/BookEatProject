@@ -4,12 +4,11 @@ import 'package:client/UI/support/size_config.dart';
 import 'package:client/model/Model.dart';
 import 'package:client/model/objects/restaurant.dart';
 import 'package:client/model/objects/review.dart';
-import 'package:client/model/support/extensions/string_capitalization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:line_icons/line_icons.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../detail/detail_screen.dart';
 
@@ -160,7 +159,7 @@ class _RestaurantsInAreaState extends State<RestaurantsInArea> {
 
   Widget _buildItem(BuildContext context, Restaurant restaurant) {
     return Container(
-        height: SizeConfig.screenHeight * 0.25,
+        height: SizeConfig.screenHeight * 0.3,
         padding: const EdgeInsets.all(10),
         child: Stack(
           children: <Widget>[
@@ -187,7 +186,7 @@ class _RestaurantsInAreaState extends State<RestaurantsInArea> {
               alignment: Alignment.centerLeft,
               child: Container(
                 width: SizeConfig.screenWidth * .6,
-                height: SizeConfig.screenHeight * 0.18,
+                height: SizeConfig.screenHeight * 0.25,
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
                     color: Colors.white,
@@ -240,7 +239,7 @@ class _RestaurantsInAreaState extends State<RestaurantsInArea> {
                             style: TextStyle(
                                 color: kTextColor,
                                 fontWeight: FontWeight.normal,
-                                fontSize: 13),
+                                fontSize: 12),
                             textAlign: TextAlign.left,
                           ),
                         ),
@@ -279,7 +278,9 @@ class _RestaurantsInAreaState extends State<RestaurantsInArea> {
   }
 
   Future<void> _pullData() async{
-    List<Restaurant> freshRestaurant = await Model.sharedInstance.searchRestaurantByCity("Cosenza");
+    SharedPreferences userData = await SharedPreferences.getInstance();
+    print(userData.toString());
+    List<Restaurant> freshRestaurant = await Model.sharedInstance.searchRestaurantByCity(userData.getString("city"));
     for(Restaurant restaurant in freshRestaurant){
       List<Review> freshReviews = await Model.sharedInstance.searchReviewByRestaurant(restaurant.id);
       restaurant.setRatings(freshReviews);

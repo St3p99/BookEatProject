@@ -89,6 +89,19 @@ public class UserController {
         }
     }
 
+    @Operation(method="getUserByEmail")
+    @GetMapping()
+    public ResponseEntity getUserByEmail(@RequestParam("email") String email) {
+        System.out.println("getUser: "+email);
+        try {
+            return ResponseEntity.ok(userService.getByEmail(email));
+        } catch (ResourceNotFoundException e) {
+            return new ResponseEntity<>(
+                    new ResponseMessage("User not found!"),
+                    HttpStatus.NOT_FOUND);
+        }
+    }
+
     @Operation(method = "getReservations", summary = "Return reservations of the user with user_id")
     @GetMapping(path = "/reservations/{user_id}")
     public ResponseEntity getReservations(@PathVariable("user_id") Long id){

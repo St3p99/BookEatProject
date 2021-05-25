@@ -43,9 +43,9 @@ class _AppState extends State<App> {
   }
 
   Future<void> checkUserLoggedIn() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    SharedPreferences userData = await SharedPreferences.getInstance();
     setState(() {
-      _logged = prefs.getString('token') != null;
+      _logged = userData.getString('token') != null;
     });
   }
 

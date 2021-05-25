@@ -29,20 +29,23 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    return Scaffold(
-      body: PageView(
-        children:[
-          DiscoverScreen(pageController: pageController),
-          SearchScreen(), ReservationsScreen(), ProfileScreen()
-        ],
-        controller: pageController,
-        onPageChanged: (page){
-          setState(() {
-            _selectedPage = NavPage.values[page];
-          });
-        },
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        body: PageView(
+          children:[
+            DiscoverScreen(pageController: pageController),
+            SearchScreen(), ReservationsScreen(), ProfileScreen()
+          ],
+          controller: pageController,
+          onPageChanged: (page){
+            setState(() {
+              _selectedPage = NavPage.values[page];
+            });
+          },
+        ),
+        bottomNavigationBar: CustomBottomNavBar(),
       ),
-      bottomNavigationBar: CustomBottomNavBar(),
     );
   }
 

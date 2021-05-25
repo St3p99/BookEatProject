@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:client/model/managers/rest_manager.dart';
 import 'package:client/model/objects/authentication_data.dart';
 import 'package:client/model/objects/restaurant.dart';
+import 'package:client/model/objects/user.dart';
 import 'package:client/model/support/constants.dart';
 import 'package:client/model/support/login_result.dart';
 import 'package:http/http.dart';
@@ -27,6 +28,7 @@ class Model {
       params["username"] = email;
       params["password"] = password;
       String result = (await _restManager.makePostRequest(ADDRESS_AUTHENTICATION_SERVER, REQUEST_LOGIN, params, type: TypeHeader.urlencoded)).body;
+      print(result);
       _authenticationData = AuthenticationData.fromJson(jsonDecode(result));
       if ( _authenticationData.hasError() ) {
         if ( _authenticationData.error == "Invalid user credentials" ) {
@@ -46,6 +48,7 @@ class Model {
       return LoginResult.logged;
     }
     catch (e) {
+      print(e);
       return LoginResult.error_unknown;
     }
   }
@@ -110,6 +113,20 @@ class Model {
     catch (e) {
       print(e);
       return List.generate(0, (index) => null);
+    }
+  }
+
+  Future<User> searchUserByEmail(String email) async {
+    Map<String, String> params = Map();
+    params["email"] = email;
+    try{
+      Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_USER_BYEMAIL, params);
+      if( response.statusCode == HttpStatus.notFound ) return null;
+      return User.fromJson(jsonDecode(response.body));
+    }
+    catch (e) {
+      print(e);
+      return null;
     }
   }
 
