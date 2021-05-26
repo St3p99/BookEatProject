@@ -22,10 +22,17 @@ const String REQUEST_LOGOUT =
     "/auth/realms/" + REALM + "/protocol/openid-connect/logout";
 
 // requests
-const String REQUEST_SEARCH_RESTAURANTS_BYCITY = "/api/search/byCity";
-const String REQUEST_SEARCH_REVIEW_BYRESTAURANT = "/api/search/review";
-const String REQUEST_ADD_USER = "/users/new";
-const String REQUEST_SEARCH_USER_BYEMAIL = "/api/users";
+
+// SEARCH CONTROLLER
+const String REQUEST_SEARCH_RESTAURANTS_BY_CITY = "/api/search/byCity";
+const String REQUEST_SEARCH_RESTAURANTS_BY_NAME_AND_CITY = "/api/search/byNameAndCity";
+const String REQUEST_SEARCH_RESTAURANTS_BY_NAME_AND_CITY_AND_CATEGORIES = "/api/search/byNameAndCityAndCategories";
+const String REQUEST_SEARCH_RESTAURANTS_BY_CITY_AND_CATEGORIES = "/api/search/byCityAndCategories";
+const String REQUEST_SEARCH_REVIEW_BY_RESTAURANT = "/api/search/review";
+
+// USER CONTROLLER
+const String REQUEST_ADD_USER = "api/users/new";
+const String REQUEST_SEARCH_USER_BY_EMAIL = "/api/users";
 
 // roles
 
@@ -37,8 +44,6 @@ const String RESPONSE_ERROR_MAIL_USER_ALREADY_EXISTS =
     "ERROR_MAIL_USER_ALREADY_EXISTS";
 
 
-const String RESPONSE_NO_CONTENT =
-    "ERROR_MAIL_USER_ALREADY_EXISTS";
 
 // messages
 const String MESSAGE_CONNECTION_ERROR = "connection_error";

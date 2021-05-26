@@ -103,4 +103,5 @@ class RestManager {
     return _makeRequest(serverAddress, servicePath, "delete", type,
         value: value);
   }
+
 }

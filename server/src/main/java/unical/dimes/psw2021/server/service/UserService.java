@@ -32,14 +32,14 @@ public class UserService {
         this.reservationRepository = reservationRepository;
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
-    public User addUser(User user) throws UniqueKeyViolationException {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new UniqueKeyViolationException();
-        }
-
-        return userRepository.save(user);
-    }
+//    @Transactional(propagation = Propagation.REQUIRED)
+//    public User addUser(User user) throws UniqueKeyViolationException {
+//        if (userRepository.existsByEmail(user.getEmail())) {
+//            throw new UniqueKeyViolationException();
+//        }
+//
+//        return userRepository.save(user);
+//    }
 
     @Transactional(readOnly = true)
     public User getById(Long id) throws ResourceNotFoundException {
@@ -62,7 +62,7 @@ public class UserService {
 
         //check posting after 12h + reservation date and time
         LocalDateTime reservationDateTime = LocalDateTime.of(reservation.getDate(), reservation.getStartTime());
-        if( LocalDateTime.now().minusHours(12).compareTo(reservationDateTime) < 0 ){
+        if( LocalDateTime.now().minusHours(2).compareTo(reservationDateTime) >= 0 ){
             throw new PostingDateTimeException();
         }
 

@@ -29,7 +29,7 @@ public class SearchController {
     /**
      * GET OPERATION
      **/
-    @Operation(method = "getByNameAndCity", summary = "Search for restaurants by name and city then return paged content")
+    @Operation(method = "getPagedByNameAndCity", summary = "Search for restaurants by name and city then return paged content")
     @GetMapping(path = "/paged/byNameAndCity")
     public ResponseEntity getByNameAndCity(
             @RequestParam(value = "name") String name,
@@ -41,7 +41,7 @@ public class SearchController {
             @RequestParam(value = "sortBy",
                     defaultValue = "id") String sortBy) {
         List<Restaurant> result = restaurantService.
-                showRestaurantByNameAndCity(name, city, pageNumber, pageSize, sortBy);
+                showRestaurantPagedByNameAndCity(name, city, pageNumber, pageSize, sortBy);
         if (result.size() <= 0)
             return ResponseEntity.noContent().build();
         return ResponseEntity.ok(result);
@@ -72,6 +72,43 @@ public class SearchController {
             return ResponseEntity.noContent().build();
         return ResponseEntity.ok(result);
     }//getByCity
+
+    @Operation(method = "getByNameAndCity", summary = "Search for restaurants by name and city")
+    @GetMapping(path = "/byNameAndCity")
+    public ResponseEntity getByNameAndCity(
+            @RequestParam(value = "name") String name,
+            @RequestParam(value = "city") String city) {
+        System.out.println("getByNameAndCity: "+name+" "+city);
+        List<Restaurant> result = restaurantService.showRestaurantByNameAndCity(name, city);
+        if (result.size() <= 0)
+            return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(result);
+    }//getByNameAndCity
+
+    @Operation(method = "getByNameAndCityAndCategories", summary = "Search for restaurants by name and city and categories")
+    @GetMapping(path = "/byNameAndCityAndCategories")
+    public ResponseEntity getByNameAndCityAndCategories(
+            @RequestParam(value = "name") String name,
+            @RequestParam(value = "city") String city,
+            @RequestParam(value = "categories") List<String> categories) {
+        System.out.println("getByNameAndCityAndCategories: "+name+" "+city+" "+categories);
+        List<Restaurant> result = restaurantService.showRestaurantByNameAndCityAndCategories(name, city, categories);
+        if (result.size() <= 0)
+            return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(result);
+    }//getByNameAndCity
+
+    @Operation(method = "getByNameAndCityAndCategories", summary = "Search for restaurants by name and city and categories")
+    @GetMapping(path = "/byCityAndCategories")
+    public ResponseEntity getByCityAndCategories(
+            @RequestParam(value = "city") String city,
+            @RequestParam(value = "categories") List<String> categories) {
+        System.out.println("getByCityAndCategories: "+city+" "+categories);
+        List<Restaurant> result = restaurantService.showRestaurantByCityAndCategories(city, categories);
+        if (result.size() <= 0)
+            return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(result);
+    }//getByNameAndCity
 
 
     @Operation(method = "getReviewsByRestaraunt")

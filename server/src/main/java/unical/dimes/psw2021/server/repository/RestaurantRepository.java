@@ -11,9 +11,15 @@ import java.util.List;
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
     Page<Restaurant> findByNameIgnoreCaseContainingAndCityIgnoreCase(String name, String city, Pageable pageable);
 
+    List<Restaurant> findByNameIgnoreCaseContainingAndCityIgnoreCase(String name, String city);
+
     Page<Restaurant> findByCityIgnoreCase(String city, Pageable pageable);
 
     List<Restaurant> findByCityIgnoreCase(String city);
 
-    boolean existsByNameAndCityAndAddress(String name, String city, String address);
+    List<Restaurant> findByNameIgnoreCaseContainingAndCityIgnoreCaseAndCategoryIn(String name, String city, List<String> categories);
+
+    List<Restaurant> findByCityIgnoreCaseAndCategoryIn(String city, List<String> categories);
+
+    boolean existsByNameIgnoreCaseAndCityAndAddress(String name, String city, String address);
 }

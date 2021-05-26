@@ -42,7 +42,7 @@ public class RestaurantService {
     }
 
     @Transactional(readOnly = true)
-    public List<Restaurant> showRestaurantByNameAndCity(
+    public List<Restaurant> showRestaurantPagedByNameAndCity(
             String name, String city, int pageNumber, int pageSize, String sortBy) {
 
         Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy));
@@ -52,28 +52,41 @@ public class RestaurantService {
 
     @Transactional(readOnly = true)
     public List<Restaurant> showRestaurantPagedByCity(String city, int pageNumber, int pageSize, String sortBy) {
-
         Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy));
         Page<Restaurant> pagedResult = restaurantRepository.findByCityIgnoreCase(city, paging);
         return pagedResult.hasContent() ? pagedResult.getContent() : new ArrayList<>();
     }
 
     @Transactional(readOnly = true)
-    public List<Restaurant> showRestaurantByCity(String city) {
+    public List<Restaurant> showRestaurantByNameAndCity(String name, String city) {
+        return restaurantRepository.findByNameIgnoreCaseContainingAndCityIgnoreCase(name,city);
+    }
 
+    @Transactional(readOnly = true)
+    public List<Restaurant> showRestaurantByCity(String city) {
         return restaurantRepository.findByCityIgnoreCase(city);
     }
 
-    @Transactional
-    public Restaurant addRestaurant(Restaurant newRestaurant) throws UniqueKeyViolationException {
-
-        if (restaurantRepository.existsByNameAndCityAndAddress(newRestaurant.getName(),
-                newRestaurant.getCity(),
-                newRestaurant.getAddress())) {
-            throw new UniqueKeyViolationException();
-        }
-        return restaurantRepository.save(newRestaurant);
+    @Transactional(readOnly = true)
+    public List<Restaurant> showRestaurantByNameAndCityAndCategories(String name, String city, List<String> categories) {
+        return restaurantRepository.findByNameIgnoreCaseContainingAndCityIgnoreCaseAndCategoryIn(name,city, categories);
     }
+
+    @Transactional(readOnly = true)
+    public List<Restaurant> showRestaurantByCityAndCategories(String city, List<String> categories) {
+        return restaurantRepository.findByCityIgnoreCaseAndCategoryIn(city, categories);
+    }
+
+//    @Transactional
+//    public Restaurant addRestaurant(Restaurant newRestaurant) throws UniqueKeyViolationException {
+//
+//        if (restaurantRepository.existsByNameAndCityAndAddress(newRestaurant.getName(),
+//                newRestaurant.getCity(),
+//                newRestaurant.getAddress())) {
+//            throw new UniqueKeyViolationException();
+//        }
+//        return restaurantRepository.save(newRestaurant);
+//    }
 
     @Transactional
     public void deleteRestaurant(Restaurant r) {

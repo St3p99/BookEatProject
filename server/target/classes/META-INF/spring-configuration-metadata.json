@@ -27,6 +27,11 @@
       "description": "Description for role.user."
     },
     {
+      "name": "security.require-ssl",
+      "type": "java.lang.String",
+      "description": "Description for security.require-ssl."
+    },
+    {
       "name": "server.keycloak.port",
       "type": "java.lang.String",
       "description": "Description for server.keycloak.port."

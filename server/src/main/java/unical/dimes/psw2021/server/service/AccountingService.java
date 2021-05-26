@@ -58,6 +58,11 @@ public class AccountingService {
 
     @Transactional
     public User registerUser(User user, String pwd) throws UniqueKeyViolationException, ConnectException{
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new UniqueKeyViolationException();
+        }
+
+
         Keycloak keycloak = getKeycloakObj();
 
         // Define user
@@ -99,11 +104,16 @@ public class AccountingService {
         // VERIFY_EMAIL, UPDATE_PROFILE, CONFIGURE_TOTP, UPDATE_PASSWORD, TERMS_AND_CONDITIONS
 //      usersResource.get(userId).executeActionsEmail(Arrays.asList("UPDATE_PASSWORD"));
 
-        return userService.addUser(user);
+        return userRepository.save(user);
     }
 
     @Transactional
     public Restaurant registerRestaurant(Restaurant restaurant, String pwd) throws UniqueKeyViolationException, ConnectException {
+        if (restaurantRepository.existsByNameIgnoreCaseAndCityAndAddress(restaurant.getName(),
+                restaurant.getCity(),
+                restaurant.getAddress())) {
+            throw new UniqueKeyViolationException();
+        }
 
         Keycloak keycloak = getKeycloakObj();
 
@@ -143,7 +153,7 @@ public class AccountingService {
         // Assign client level role to user
         userResource.roles().clientLevel(app1Client.getId()).add(Arrays.asList(userClientRole));
 
-        return restaurantService.addRestaurant(restaurant);
+        return restaurantRepository.save(restaurant);
     }
 
     @Transactional

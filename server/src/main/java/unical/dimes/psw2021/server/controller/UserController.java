@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -78,7 +79,7 @@ public class UserController {
      * GET OPERATION
      **/
     @Operation(method="getUser")
-    @GetMapping("/{user_id}")
+    @GetMapping(value = "/{user_id}")
     public ResponseEntity getUser(@PathVariable("user_id") Long id) {
         try {
             return ResponseEntity.ok(userService.getById(id));

@@ -27,128 +27,130 @@ class _LoginScreenState extends State<LoginScreen>{
 
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    return new Scaffold(
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 50, 20, 50),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  width: SizeConfig.screenWidth,
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [SizedBox(
-                              height: SizeConfig.screenHeight*0.1,
-                              child: Image.asset("assets/images/app.png")
-                          ),
-                          ]
-                        ),
+    return SafeArea(
+      child: new Scaffold(
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 50),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    width: SizeConfig.screenWidth,
+                      child: Column(
+                        children: <Widget>[
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children:[ SizedBox(
-                              height: SizeConfig.screenHeight*0.2,
-                              child: AutoSizeText(APP_NAME,
-                                    style: TextStyle(
-                                        color: Colors.grey,
-                                        fontSize: 70.0, fontWeight: FontWeight.bold)
-                              ),
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [SizedBox(
+                                height: SizeConfig.screenHeight*0.1,
+                                child: Image.asset("assets/images/app.png")
                             ),
                             ]
                           ),
-                      ],
-                    ),
-                  ),
-                Container(
-                    padding: EdgeInsets.only(
-                      left: SizeConfig.screenWidth*0.05,
-                      right: SizeConfig.screenWidth*0.05,
-                    ),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: <Widget>[
-                          TextFormField(
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                                labelText: 'EMAIL',
-                                labelStyle: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey),
-                            ),
-                            validator: (value) => _validateEmail(value),
-                            onSaved: (value) => _email = value,
-                            onFieldSubmitted: (value) => _login(),
-                          ),
-                          SizedBox(height: 20.0),
-                          TextFormField(
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                                labelText: 'PASSWORD',
-                                labelStyle: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey),
-                            ),
-                            validator: (value) => _validatePassword(value),
-                            onSaved: (value) => _password = value,
-                            onFieldSubmitted: (value) => _login(),
-                            obscureText: true,
-                          ),
-                          SizedBox(height: 20.0),
-                          GestureDetector(
-                            onTap: () => _login(),
-                            child: Container(
-                              height: 40.0,
-                              child: Material(
-                                borderRadius: BorderRadius.circular(20.0),
-                                shadowColor: kPrimaryColor.withOpacity(0.5),
-                                color: kPrimaryColor,
-                                elevation: 7.0,
-                                  child: Center(
-                                    child: Text(
-                                      AppLocalizations.of(context).translate("login").toUpperCase(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children:[ SizedBox(
+                                height: SizeConfig.screenHeight*0.2,
+                                child: AutoSizeText(APP_NAME,
                                       style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
+                                          color: Colors.grey,
+                                          fontSize: 70.0, fontWeight: FontWeight.bold)
+                                ),
+                              ),
+                              ]
+                            ),
+                        ],
+                      ),
+                    ),
+                  Container(
+                      padding: EdgeInsets.only(
+                        left: SizeConfig.screenWidth*0.05,
+                        right: SizeConfig.screenWidth*0.05,
+                      ),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          children: <Widget>[
+                            TextFormField(
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                  labelText: 'EMAIL',
+                                  labelStyle: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey),
+                              ),
+                              validator: (value) => _validateEmail(value),
+                              onSaved: (value) => _email = value,
+                              onFieldSubmitted: (value) => _login(),
+                            ),
+                            SizedBox(height: getProportionateScreenHeight(20)),
+                            TextFormField(
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                  labelText: 'PASSWORD',
+                                  labelStyle: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey),
+                              ),
+                              validator: (value) => _validatePassword(value),
+                              onSaved: (value) => _password = value,
+                              onFieldSubmitted: (value) => _login(),
+                              obscureText: true,
+                            ),
+                            SizedBox(height: getProportionateScreenHeight(20)),
+                            GestureDetector(
+                              onTap: () => _login(),
+                              child: Container(
+                                height: 40.0,
+                                child: Material(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  shadowColor: kPrimaryColor.withOpacity(0.5),
+                                  color: kPrimaryColor,
+                                  elevation: 7.0,
+                                    child: Center(
+                                      child: Text(
+                                        AppLocalizations.of(context).translate("login").toUpperCase(),
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                        ],
+                          ],
+                        ),
+                      )),
+                  SizedBox(height: getProportionateScreenHeight(15)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        AppLocalizations.of(context).translate("unregistred").capitalize
+                        +" "+APP_NAME+"?",
+                        style: TextStyle(),
                       ),
-                    )),
-                SizedBox(height: 15.0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      AppLocalizations.of(context).translate("unregistred").capitalize
-                      +" "+APP_NAME+"?",
-                      style: TextStyle(),
-                    ),
-                    SizedBox(width: 5.0),
-                    InkWell(
-                      onTap: () {
-                        //TODO: navigator.push -> signupScreen
-                      },
-                      child: Text(
-                        AppLocalizations.of(context).translate("register").capitalize,
-                        style: TextStyle(
-                            color: kPrimaryColor,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline),
-                      ),
-                    )
-                  ],
-                )
-              ],
+                      SizedBox(height: getProportionateScreenHeight(5)),
+                      InkWell(
+                        onTap: () {
+                          //TODO: navigator.push -> signupScreen
+                        },
+                        child: Text(
+                          AppLocalizations.of(context).translate("register").capitalize,
+                          style: TextStyle(
+                              color: kPrimaryColor,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline),
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              ),
             ),
-          ),
-        )
+          )
+      ),
     );
   }
 
@@ -201,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen>{
             duration: Duration(seconds: 1),
           )
       );
-      // TEMPORANEO
+      // // TEMPORANEO
       User user = await Model.sharedInstance.searchUserByEmail(_email);
       print(user);
       if(user != null){

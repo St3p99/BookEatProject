@@ -88,12 +88,59 @@ class Model {
     }
   }
 
+  // SEARCH
 
   Future<List<Restaurant>> searchRestaurantByCity(String city) async {
     Map<String, String> params = Map();
     params["city"] = city;
     try{
-      Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_RESTAURANTS_BYCITY, params);
+      Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_RESTAURANTS_BY_CITY, params);
+      if( response.statusCode == HttpStatus.noContent ) return List.generate(0, (index) => null);
+      return List<Restaurant>.from(json.decode(response.body).map((i) => Restaurant.fromJson(i)).toList());
+    }
+    catch (e) {
+      print(e);
+      return List.generate(0, (index) => null);
+    }
+  }
+
+  Future<List<Restaurant>> searchRestaurantByNameAndCity(String name, String city) async {
+    Map<String, String> params = Map();
+    params["name"] = name;
+    params["city"] = city;
+    try{
+      Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_RESTAURANTS_BY_NAME_AND_CITY, params);
+      if( response.statusCode == HttpStatus.noContent ) return List.generate(0, (index) => null);
+      return List<Restaurant>.from(json.decode(response.body).map((i) => Restaurant.fromJson(i)).toList());
+    }
+    catch (e) {
+      print(e);
+      return List.generate(0, (index) => null);
+    }
+  }
+
+  Future<List<Restaurant>> searchRestaurantByNameAndCityAndCategories(String name, String city, List<String> categories) async {
+    Map<String, dynamic> params = Map();
+    params["name"] = name;
+    params["city"] = city;
+    params["categories"] = categories;
+    try{
+      Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_RESTAURANTS_BY_NAME_AND_CITY_AND_CATEGORIES, params);
+      if( response.statusCode == HttpStatus.noContent ) return List.generate(0, (index) => null);
+      return List<Restaurant>.from(json.decode(response.body).map((i) => Restaurant.fromJson(i)).toList());
+    }
+    catch (e) {
+      print(e);
+      return List.generate(0, (index) => null);
+    }
+  }
+
+  Future<List<Restaurant>> searchRestaurantByCityAndCategories(String city, List<String> categories) async {
+    Map<String, dynamic> params = Map();
+    params["city"] = city;
+    params["categories"] = categories;
+    try{
+      Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_RESTAURANTS_BY_CITY_AND_CATEGORIES, params);
       if( response.statusCode == HttpStatus.noContent ) return List.generate(0, (index) => null);
       return List<Restaurant>.from(json.decode(response.body).map((i) => Restaurant.fromJson(i)).toList());
     }
@@ -105,7 +152,7 @@ class Model {
 
   Future<List<Review>> searchReviewByRestaurant(int id) async {
     try{
-      Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_REVIEW_BYRESTAURANT+"/$id");
+      Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_REVIEW_BY_RESTAURANT+"/$id");
       if( response.statusCode == HttpStatus.noContent )
         return List.generate(0, (index) => null);
       return List<Review>.from(json.decode(response.body).map((i) => Review.fromJson(i)).toList());
@@ -116,11 +163,13 @@ class Model {
     }
   }
 
+  // USER
+
   Future<User> searchUserByEmail(String email) async {
     Map<String, String> params = Map();
     params["email"] = email;
     try{
-      Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_USER_BYEMAIL, params);
+      Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_USER_BY_EMAIL, params);
       if( response.statusCode == HttpStatus.notFound ) return null;
       return User.fromJson(jsonDecode(response.body));
     }
@@ -155,6 +204,4 @@ class Model {
   //     return null; // not the best solution
   //   }
   // }
-
-
 }
