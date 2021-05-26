@@ -201,30 +201,30 @@ class _LoginScreenState extends State<LoginScreen>{
             duration: Duration(seconds: 1),
           )
       );
-      _getToken();
-      switch( _loginResult){
-        case LoginResult.logged:
-          User user = await Model.sharedInstance.searchUserByEmail(_email);
-          user.setUserPrefs();
-          Navigator.push(context, PageTransition(
-              type: PageTransitionType.leftToRight,
-              child: Home()
-          )); break;
-        case LoginResult.error_wrong_credentials:
-          _showErrorDialog("WRONG CREDENTIALS", "message..");
-          break;
-        default:
-          /* TEMPORARY */
-          User user = await Model.sharedInstance.searchUserByEmail(_email);
-          if(user != null){
-            user.setUserPrefs();
-            Navigator.push(context, PageTransition(
+      // TEMPORANEO
+      User user = await Model.sharedInstance.searchUserByEmail(_email);
+      print(user);
+      if(user != null){
+        user.setUserPrefs();
+        Navigator.push(context, PageTransition(
             type: PageTransitionType.leftToRight,
             child: Home()));
-          }
-          /* TEMPORARY */
-          _showErrorDialog("KEYCLOAK ERROR", "messagge..");
       }
+
+      // _getToken(); //TODO:
+      // switch( _loginResult){
+      //   case LoginResult.logged:
+      //     User user = await Model.sharedInstance.searchUserByEmail(_email);
+      //     user.setUserPrefs();
+      //     Navigator.push(context, PageTransition(
+      //         type: PageTransitionType.leftToRight,
+      //         child: Home()
+      //     )); break;
+      //   case LoginResult.error_wrong_credentials:
+      //     _showErrorDialog("WRONG CREDENTIALS", "message..");
+      //     break;
+      //   default:_showErrorDialog("KEYCLOAK ERROR", "messagge..");
+      // }
     }
   }
 

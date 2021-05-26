@@ -35,5 +35,10 @@
   "register": "register",
   "register_my_restaurant": "register my restaurant",
   "firstName": "first name",
-  "lastName": "last name"
+  "lastName": "last name",
+  "pizza": "pizza",
+  "sushi": "sushi",
+  "pub": "pub",
+  "grill": "grill",
+  "cafe": "cafè"
 }

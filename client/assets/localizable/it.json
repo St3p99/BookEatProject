@@ -34,5 +34,10 @@
   "login": "accedi",
   "register": "registrati",
   "firstName": "nome",
-  "lastName": "cognome"
+  "lastName": "cognome",
+  "pizza": "pizza",
+  "sushi": "sushi",
+  "pub": "pub",
+  "grill": "grill",
+  "cafe": "cafè"
 }

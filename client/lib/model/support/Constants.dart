@@ -2,8 +2,15 @@
 const int MAX_NOP = 15;
 
 // addresses
+
+// ANDROID DEVICE DEBUGGING
 const String ADDRESS_STORE_SERVER = "192.168.1.54:8080";
 const String ADDRESS_AUTHENTICATION_SERVER = "192.168.1.54:8444";
+
+// WEB DEBUGGING
+// const String ADDRESS_STORE_SERVER = "localhost:8080";
+// const String ADDRESS_AUTHENTICATION_SERVER = "localhost:8444";
+
 
 // authentication
 const String REALM = "BookIT-Realm";
@@ -21,6 +28,9 @@ const String REQUEST_ADD_USER = "/users/new";
 const String REQUEST_SEARCH_USER_BYEMAIL = "/api/users";
 
 // roles
+
+// categories
+const List<String> categories = ["pizza", "sushi", "pub", "grill", "cafe"];
 
 // responses
 const String RESPONSE_ERROR_MAIL_USER_ALREADY_EXISTS =

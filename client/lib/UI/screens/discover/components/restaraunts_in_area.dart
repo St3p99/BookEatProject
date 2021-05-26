@@ -159,7 +159,7 @@ class _RestaurantsInAreaState extends State<RestaurantsInArea> {
 
   Widget _buildItem(BuildContext context, Restaurant restaurant) {
     return Container(
-        height: SizeConfig.screenHeight * 0.3,
+        height: SizeConfig.screenHeight * 0.25,
         padding: const EdgeInsets.all(10),
         child: Stack(
           children: <Widget>[
@@ -186,7 +186,7 @@ class _RestaurantsInAreaState extends State<RestaurantsInArea> {
               alignment: Alignment.centerLeft,
               child: Container(
                 width: SizeConfig.screenWidth * .6,
-                height: SizeConfig.screenHeight * 0.25,
+                height: SizeConfig.screenHeight * 0.21,
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
                     color: Colors.white,

@@ -218,7 +218,7 @@ class _BookingPageState extends State<BookingPage> {
           shape: StadiumBorder(
               side: BorderSide(
                   color: Colors.grey[800],
-                  width: selectedService == index ? 3 : 0.2))),
+                  width: selectedService == index ? 3 : 1))),
     );
   }
 
@@ -261,7 +261,7 @@ class _BookingPageState extends State<BookingPage> {
           shape: StadiumBorder(
               side: BorderSide(
                   color: Colors.grey[800],
-                  width: selectedTime == index ? 3 : 0.2))),
+                  width: selectedTime == index ? 3 : 1))),
     );
   }
 
@@ -305,7 +305,7 @@ class _BookingPageState extends State<BookingPage> {
           shape: StadiumBorder(
               side: BorderSide(
                   color: Colors.grey[800],
-                  width: selectedNOP == nop ? 3 : 0.2))),
+                  width: selectedNOP == nop ? 3 : 1))),
     );
   }
 }

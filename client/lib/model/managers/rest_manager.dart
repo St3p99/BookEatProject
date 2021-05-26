@@ -30,7 +30,8 @@ class RestManager {
         }
         // setting headers
         Map<String, String> headers = Map();
-        headers[HttpHeaders.contentTypeHeader] = contentType;
+        if(contentType != null)
+          headers[HttpHeaders.contentTypeHeader] = contentType;
         if (token != null) {
           headers[HttpHeaders.authorizationHeader] = 'bearer $token';
         }
@@ -81,9 +82,10 @@ class RestManager {
   }
 
   Future<Response> makePostRequest(
-      String serverAddress, String servicePath, dynamic value,
-      {TypeHeader type = TypeHeader.json}) async {
-    return _makeRequest(serverAddress, servicePath, "post", type, body: value);
+      String serverAddress, String servicePath, dynamic body,
+      {Map<String, String> value,
+       TypeHeader type = TypeHeader.json}) async {
+    return _makeRequest(serverAddress, servicePath, "post", type, body: body, value: value);
   }
 
   Future<Response> makeGetRequest(String serverAddress, String servicePath,
