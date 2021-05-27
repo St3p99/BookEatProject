@@ -8,6 +8,7 @@ import 'package:client/model/objects/user.dart';
 import 'package:client/model/support/constants.dart';
 import 'package:client/model/support/login_result.dart';
 import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'objects/review.dart';
 
@@ -17,18 +18,17 @@ class Model {
 
   RestManager _restManager = RestManager();
   AuthenticationData _authenticationData;
-
+  SharedPreferences _sharedPreferences;
 
   Future<LoginResult> logIn(String email, String password) async {
     try{
-      Map<String, String> params = Map();
+      Map<String, dynamic> params = Map();
       params["grant_type"] = "password";
       params["client_id"] = CLIENT_ID;
       params["client_secret"] = CLIENT_SECRET;
       params["username"] = email;
       params["password"] = password;
       String result = (await _restManager.makePostRequest(ADDRESS_AUTHENTICATION_SERVER, REQUEST_LOGIN, params, type: TypeHeader.urlencoded)).body;
-      print(result);
       _authenticationData = AuthenticationData.fromJson(jsonDecode(result));
       if ( _authenticationData.hasError() ) {
         if ( _authenticationData.error == "Invalid user credentials" ) {
@@ -42,6 +42,8 @@ class Model {
         }
       }
       _restManager.token = _authenticationData.accessToken;
+      _sharedPreferences = await SharedPreferences.getInstance();
+      _sharedPreferences.setString('token', _authenticationData.accessToken);
       Timer.periodic(Duration(seconds: (_authenticationData.expiresIn - 50)), (Timer t) {
         _refreshToken();
       });
@@ -55,7 +57,7 @@ class Model {
 
   Future<bool> _refreshToken() async {
     try {
-      Map<String, String> params = Map();
+      Map<String, dynamic> params = Map();
       params["grant_type"] = "refresh_token";
       params["client_id"] = CLIENT_ID;
       params["client_secret"] = CLIENT_SECRET;
@@ -66,6 +68,8 @@ class Model {
         return false;
       }
       _restManager.token = _authenticationData.accessToken;
+      _sharedPreferences = await SharedPreferences.getInstance();
+      _sharedPreferences.setString('token', _authenticationData.accessToken);
       return true;
     }
     catch (e) {
@@ -75,8 +79,10 @@ class Model {
 
   Future<bool> logOut() async {
     try{
-      Map<String, String> params = Map();
+      Map<String, dynamic> params = Map();
       _restManager.token = null;
+      _sharedPreferences = await SharedPreferences.getInstance();
+      _sharedPreferences.setString('token', null);
       params["client_id"] = CLIENT_ID;
       params["client_secret"] = CLIENT_SECRET;
       params["refresh_token"] = _authenticationData.refreshToken;
@@ -91,7 +97,7 @@ class Model {
   // SEARCH
 
   Future<List<Restaurant>> searchRestaurantByCity(String city) async {
-    Map<String, String> params = Map();
+    Map<String, dynamic> params = Map();
     params["city"] = city;
     try{
       Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_RESTAURANTS_BY_CITY, params);
@@ -105,7 +111,7 @@ class Model {
   }
 
   Future<List<Restaurant>> searchRestaurantByNameAndCity(String name, String city) async {
-    Map<String, String> params = Map();
+    Map<String, dynamic> params = Map();
     params["name"] = name;
     params["city"] = city;
     try{
@@ -163,10 +169,19 @@ class Model {
     }
   }
 
+  // SUPPORT
+
+  Future<void> loadRestaurantReviews(List<Restaurant> restaurants) async{
+    for(Restaurant restaurant in restaurants){
+      List<Review> reviews = await Model.sharedInstance.searchReviewByRestaurant(restaurant.id);
+      restaurant.setRatings(reviews);
+    }
+  }
+
   // USER
 
   Future<User> searchUserByEmail(String email) async {
-    Map<String, String> params = Map();
+    Map<String, dynamic> params = Map();
     params["email"] = email;
     try{
       Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_USER_BY_EMAIL, params);

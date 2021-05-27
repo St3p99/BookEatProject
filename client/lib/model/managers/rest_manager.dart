@@ -11,7 +11,7 @@ class RestManager {
   ErrorListener delegate;
   String token;
 
-  Future<Response> _makeRequest(String serverAddress, String servicePath, String method, TypeHeader type, {Map<String, String> value, dynamic body}) async {
+  Future<Response> _makeRequest(String serverAddress, String servicePath, String method, TypeHeader type, {Map<String, dynamic> value, dynamic body}) async {
     Uri uri = Uri.https(serverAddress, servicePath, value);
     bool errorOccurred = false;
     while (true) {
@@ -83,23 +83,23 @@ class RestManager {
 
   Future<Response> makePostRequest(
       String serverAddress, String servicePath, dynamic body,
-      {Map<String, String> value,
+      {Map<String, dynamic> value,
        TypeHeader type = TypeHeader.json}) async {
     return _makeRequest(serverAddress, servicePath, "post", type, body: body, value: value);
   }
 
   Future<Response> makeGetRequest(String serverAddress, String servicePath,
-      [Map<String, String> value, TypeHeader type]) async {
+      [Map<String, dynamic> value, TypeHeader type]) async {
     return _makeRequest(serverAddress, servicePath, "get", type, value: value);
   }
 
   Future<Response> makePutRequest(String serverAddress, String servicePath,
-      [Map<String, String> value, TypeHeader type]) async {
+      [Map<String, dynamic> value, TypeHeader type]) async {
     return _makeRequest(serverAddress, servicePath, "put", type, value: value);
   }
 
   Future<Response> makeDeleteRequest(String serverAddress, String servicePath,
-      [Map<String, String> value, TypeHeader type]) async {
+      [Map<String, dynamic> value, TypeHeader type]) async {
     return _makeRequest(serverAddress, servicePath, "delete", type,
         value: value);
   }

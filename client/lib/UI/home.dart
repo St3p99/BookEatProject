@@ -33,6 +33,7 @@ class _HomeState extends State<Home> {
       onWillPop: () async => false,
       child: Scaffold(
         body: PageView(
+          physics: NeverScrollableScrollPhysics(),
           children:[
             DiscoverScreen(pageController: pageController),
             SearchScreen(), ReservationsScreen(), ProfileScreen()
@@ -55,7 +56,10 @@ class _HomeState extends State<Home> {
         height: SizeConfig.screenHeight * 0.06,
         decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.all(Radius.circular(100)),
+            borderRadius: BorderRadius.only(
+                topLeft:Radius.circular(15),
+                topRight:Radius.circular(15)
+            ),
             boxShadow: [
               BoxShadow(
                 blurRadius: 15,

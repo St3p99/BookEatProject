@@ -1,3 +1,4 @@
+import 'package:client/model/support/extensions/string_capitalization.dart';
 import 'package:client/UI/behaviors/app_localizations.dart';
 import 'package:client/UI/components/restaurant_card.dart';
 import 'package:client/UI/support/constants.dart';
@@ -67,7 +68,7 @@ class _RestaurantsInAreaState extends State<RestaurantsInArea> {
                       child: SizedBox(
                           height: SizeConfig.screenHeight * 0.10,
                           width: SizeConfig.screenHeight * 0.10,
-                          child: Text("NO RESULT!")
+                          child: Text(AppLocalizations.of(context).translate("no_result").capitalize+"!")
                       )
                   );
                 }
@@ -151,25 +152,22 @@ class _RestaurantsInAreaState extends State<RestaurantsInArea> {
                                 new DetailScreen(
                                     restaurant: restaurants[index]))).then((
                             value) => setState(() {})),
-                    child: _buildItem(context, restaurants[index]));
+                    child: RestaurantCard(restaurant: restaurants[index]));
               }),
         )
       ],
     );
   }
 
-  Widget _buildItem(BuildContext context, Restaurant restaurant) {
-    return RestaurantCard(restaurant: restaurant);
-  }
-
   Future<void> _pullData() async{
     SharedPreferences userData = await SharedPreferences.getInstance();
     print(userData.toString());
     List<Restaurant> freshRestaurant = await Model.sharedInstance.searchRestaurantByCity(userData.getString("city"));
-    for(Restaurant restaurant in freshRestaurant){
-      List<Review> freshReviews = await Model.sharedInstance.searchReviewByRestaurant(restaurant.id);
-      restaurant.setRatings(freshReviews);
-    }
+    await Model.sharedInstance.loadRestaurantReviews(freshRestaurant);
+    // for(Restaurant restaurant in freshRestaurant){
+    //   List<Review> freshReviews = await Model.sharedInstance.searchReviewByRestaurant(restaurant.id);
+    //   restaurant.setRatings(freshReviews);
+    // }
     setState(() {
       result = Future.value(freshRestaurant);
     });
