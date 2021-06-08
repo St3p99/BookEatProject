@@ -80,17 +80,18 @@ class DetailScreen extends StatelessWidget {
                             Flexible(
                               child: Padding(
                                 padding:
-                                    const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                    const EdgeInsets.fromLTRB(15, 0, 10, 0),
                                 child: Text(
                                   restaurant.name,
                                   style: TextStyle(
+                                      color: kTextLightColor,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 30),
                                 ),
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                              padding: const EdgeInsets.fromLTRB(15, 0, 10, 0),
                               child: Text(
                                 "${restaurant.category.toUpperCase()}",
                                 style: TextStyle(
@@ -101,7 +102,7 @@ class DetailScreen extends StatelessWidget {
                             ),
                             Flexible(
                               child: Padding(
-                                padding: const EdgeInsets.fromLTRB(5, 5, 10, 15),
+                                padding: const EdgeInsets.fromLTRB(10, 5, 10, 15),
                                 child: Row(
                                   children: [
                                     Icon(
@@ -215,30 +216,33 @@ class DetailScreen extends StatelessWidget {
   }
 
   Widget _buildWidgetRating(String name, double rating) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CircularPercentIndicator(
-          radius: 50.0,
-          lineWidth: 5.0,
-          animation: true,
-          animationDuration: 1000,
-          percent: rating / 5,
-          center: Text(
-            rating.toString(),
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
-          ),
-          header: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              name.capitalize,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0),
+    return SizedBox(
+      width: SizeConfig.screenWidth*0.2,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircularPercentIndicator(
+            radius: 50.0,
+            lineWidth: 5.0,
+            animation: true,
+            animationDuration: 3000,
+            percent: (rating/MAX_RATING),
+            center: Text(
+              rating.toStringAsFixed(1),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
             ),
-          ),
-          circularStrokeCap: CircularStrokeCap.round,
-          progressColor: kPrimaryColor,
-        )
-      ],
+            header: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                name.capitalize,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0),
+              ),
+            ),
+            circularStrokeCap: CircularStrokeCap.round,
+            progressColor: kPrimaryColor,
+          )
+        ],
+      ),
     );
   }
 }

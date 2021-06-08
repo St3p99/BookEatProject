@@ -6,6 +6,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import unical.dimes.psw2021.server.model.Reservation;
@@ -20,11 +21,11 @@ import javax.persistence.OptimisticLockException;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
 @RequestMapping("${base-url}/booking")
-//@PreAuthorize("hasAnyAuthority('user', 'restaurant_manager')")
 public class ReservationController {
     private final RestaurantService restaurantService;
     private final ReservationService reservationService;
@@ -40,13 +41,14 @@ public class ReservationController {
     /**
      * POST OPERATION
      **/
+    @PreAuthorize("hasAnyAuthority('user', 'restaurant_manager')")
     @Operation(method = "newReservation", summary = "Create a new Reservation")
     @PostMapping(path = "/new")
     public ResponseEntity newReservation(
             @RequestBody @Valid Reservation reservation, BindingResult bindingResult) {
 
+        System.out.println(reservation);
         if (bindingResult.hasErrors()) return ResponseEntity.badRequest().build();
-
         try {
             return ResponseEntity
                     .status(HttpStatus.CREATED)
@@ -68,9 +70,8 @@ public class ReservationController {
         }
     }
 
-    /**
-     * GET OPERATION
-     **/
+    /** GET OPERATION **/
+    @PreAuthorize("hasAuthority('user')")
     @Operation(method = "getTableServicesByDate", summary = "Return table service available on date for the restauraunt with id")
     @GetMapping(path = "/services")
     public ResponseEntity getTableServicesByDate(
@@ -80,21 +81,25 @@ public class ReservationController {
             List<TableService> result = restaurantService.showTableServicesByDay(restaurantId, date.getDayOfWeek());
             if (result.size() <= 0)
                 return ResponseEntity.noContent().build();
-            return ResponseEntity.ok(result);
+            else{
+                Collections.sort(result);
+                return ResponseEntity.ok(result);
+            }
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }//getTableServices
 
-    @Operation(method = "getAvailability", summary = "Returns availability")
-    @GetMapping(path = "/availability/")
-    public ResponseEntity getAvailability(
+    @PreAuthorize("hasAuthority('user')")
+    @Operation(method = "getSeatsAvailable", summary = "Returns number of seats available")
+    @GetMapping(path = "/availability")
+    public ResponseEntity getSeatsAvailable(
             @RequestParam(name = "service_id") Long serviceId,
             @RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam(name = "time") @DateTimeFormat(pattern = "HH:mm:ss") LocalTime time,
-            @RequestParam(name = "n_guests") int nGuests) {
+            @RequestParam(name = "time") @DateTimeFormat(pattern = "HH:mm:ss") LocalTime time) {
+        System.out.println("getSeatsAvailable " + serviceId +" "+ date +" "+ time   +" ");
         try {
-            return ResponseEntity.ok(reservationService.getAvailability(serviceId, date, time, nGuests));
+            return ResponseEntity.ok(reservationService.getSeatsAvailable(serviceId, date, time));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
@@ -102,6 +107,7 @@ public class ReservationController {
     /** PUT OPERATION **/
 
     /** DELETE OPERATION **/
+    @PreAuthorize("hasAuthority('user')")
     @Operation(method = "deleteReservation", summary = "Delete a reservation")
     @DeleteMapping(path = "/reservations/delete/{id}")
     public ResponseEntity deleteReservation(@PathVariable Long id) {

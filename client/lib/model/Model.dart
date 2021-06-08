@@ -2,13 +2,17 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:client/model/managers/rest_manager.dart';
+import 'package:client/model/managers/persistent_storage_manager.dart';
 import 'package:client/model/objects/authentication_data.dart';
+import 'package:client/model/objects/reservation.dart';
 import 'package:client/model/objects/restaurant.dart';
+import 'package:client/model/objects/table_service.dart';
 import 'package:client/model/objects/user.dart';
+import 'package:client/model/support/booking_response.dart';
 import 'package:client/model/support/constants.dart';
 import 'package:client/model/support/login_result.dart';
+import 'package:client/model/support/review_response.dart';
 import 'package:http/http.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'objects/review.dart';
 
@@ -18,7 +22,8 @@ class Model {
 
   RestManager _restManager = RestManager();
   AuthenticationData _authenticationData;
-  SharedPreferences _sharedPreferences;
+  PersistentStorageManager _persistentStorageManager = PersistentStorageManager();
+  User currentUser;
 
   Future<LoginResult> logIn(String email, String password) async {
     try{
@@ -28,7 +33,7 @@ class Model {
       params["client_secret"] = CLIENT_SECRET;
       params["username"] = email;
       params["password"] = password;
-      String result = (await _restManager.makePostRequest(ADDRESS_AUTHENTICATION_SERVER, REQUEST_LOGIN, params, type: TypeHeader.urlencoded)).body;
+      String result = (await _restManager.makePostRequest(ADDRESS_AUTHENTICATION_SERVER, REQUEST_LOGIN, params, type: TypeHeader.urlencoded,  httpsEnabled: false)).body;
       _authenticationData = AuthenticationData.fromJson(jsonDecode(result));
       if ( _authenticationData.hasError() ) {
         if ( _authenticationData.error == "Invalid user credentials" ) {
@@ -41,9 +46,11 @@ class Model {
           return LoginResult.error_unknown;
         }
       }
+
+      _persistentStorageManager.setString(STORAGE_REFRESH_TOKEN, _authenticationData.refreshToken);
+      _persistentStorageManager.setString(STORAGE_EMAIL, email);
       _restManager.token = _authenticationData.accessToken;
-      _sharedPreferences = await SharedPreferences.getInstance();
-      _sharedPreferences.setString('token', _authenticationData.accessToken);
+      await _loadUser(email);
       Timer.periodic(Duration(seconds: (_authenticationData.expiresIn - 50)), (Timer t) {
         _refreshToken();
       });
@@ -55,6 +62,30 @@ class Model {
     }
   }
 
+  Future<String> getLastEmailAccess() async {
+    return _persistentStorageManager.getString(STORAGE_EMAIL);
+  }
+
+  Future<bool> autoLogin() async {
+    String email = await _persistentStorageManager.getString(STORAGE_EMAIL);
+    String refreshToken = await _persistentStorageManager.getString(STORAGE_REFRESH_TOKEN);
+    if ( refreshToken != null && email != null ) {
+      _authenticationData = AuthenticationData();
+      _authenticationData.refreshToken = refreshToken;
+      bool autoLogInResult = await _refreshToken();
+      if ( autoLogInResult ) {
+        await _loadUser(email);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future<void> _loadUser(String email) async{
+    currentUser = await Model.sharedInstance.searchUserByEmail(email);
+    print(currentUser);
+  }
+
   Future<bool> _refreshToken() async {
     try {
       Map<String, dynamic> params = Map();
@@ -62,14 +93,16 @@ class Model {
       params["client_id"] = CLIENT_ID;
       params["client_secret"] = CLIENT_SECRET;
       params["refresh_token"] = _authenticationData.refreshToken;
-      String result = (await _restManager.makePostRequest(ADDRESS_AUTHENTICATION_SERVER, REQUEST_LOGIN, params, type: TypeHeader.urlencoded)).body;
+      String result = (await _restManager.makePostRequest(
+          ADDRESS_AUTHENTICATION_SERVER,
+          REQUEST_LOGIN,
+          params, type: TypeHeader.urlencoded, httpsEnabled: false)).body;
       _authenticationData = AuthenticationData.fromJson(jsonDecode(result));
       if ( _authenticationData.hasError() ) {
+        _persistentStorageManager.remove(STORAGE_REFRESH_TOKEN);
         return false;
       }
       _restManager.token = _authenticationData.accessToken;
-      _sharedPreferences = await SharedPreferences.getInstance();
-      _sharedPreferences.setString('token', _authenticationData.accessToken);
       return true;
     }
     catch (e) {
@@ -81,12 +114,14 @@ class Model {
     try{
       Map<String, dynamic> params = Map();
       _restManager.token = null;
-      _sharedPreferences = await SharedPreferences.getInstance();
-      _sharedPreferences.setString('token', null);
+      _persistentStorageManager.setString('token', null);
       params["client_id"] = CLIENT_ID;
       params["client_secret"] = CLIENT_SECRET;
       params["refresh_token"] = _authenticationData.refreshToken;
-      await _restManager.makePostRequest(ADDRESS_AUTHENTICATION_SERVER, REQUEST_LOGOUT, params, type: TypeHeader.urlencoded);
+      await _restManager.makePostRequest(ADDRESS_AUTHENTICATION_SERVER, REQUEST_LOGOUT, params, type: TypeHeader.urlencoded,  httpsEnabled: false);
+      _persistentStorageManager.remove(STORAGE_REFRESH_TOKEN);
+      _persistentStorageManager.remove(STORAGE_EMAIL);
+      currentUser = null;
       return true;
     }
     catch (e) {
@@ -102,11 +137,13 @@ class Model {
     try{
       Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_RESTAURANTS_BY_CITY, params);
       if( response.statusCode == HttpStatus.noContent ) return List.generate(0, (index) => null);
-      return List<Restaurant>.from(json.decode(response.body).map((i) => Restaurant.fromJson(i)).toList());
+      else if( response.statusCode == HttpStatus.ok )
+        return List<Restaurant>.from(json.decode(response.body).map((i) => Restaurant.fromJson(i)).toList());
+      else return null;
     }
     catch (e) {
       print(e);
-      return List.generate(0, (index) => null);
+      return null;;
     }
   }
 
@@ -117,11 +154,13 @@ class Model {
     try{
       Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_RESTAURANTS_BY_NAME_AND_CITY, params);
       if( response.statusCode == HttpStatus.noContent ) return List.generate(0, (index) => null);
-      return List<Restaurant>.from(json.decode(response.body).map((i) => Restaurant.fromJson(i)).toList());
+      else if( response.statusCode == HttpStatus.ok )
+        return List<Restaurant>.from(json.decode(response.body).map((i) => Restaurant.fromJson(i)).toList());
+      else return null;
     }
     catch (e) {
       print(e);
-      return List.generate(0, (index) => null);
+      return null;
     }
   }
 
@@ -133,11 +172,13 @@ class Model {
     try{
       Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_RESTAURANTS_BY_NAME_AND_CITY_AND_CATEGORIES, params);
       if( response.statusCode == HttpStatus.noContent ) return List.generate(0, (index) => null);
-      return List<Restaurant>.from(json.decode(response.body).map((i) => Restaurant.fromJson(i)).toList());
+      else if( response.statusCode == HttpStatus.ok )
+        return List<Restaurant>.from(json.decode(response.body).map((i) => Restaurant.fromJson(i)).toList());
+      else return null;
     }
     catch (e) {
       print(e);
-      return List.generate(0, (index) => null);
+      return null;
     }
   }
 
@@ -146,13 +187,18 @@ class Model {
     params["city"] = city;
     params["categories"] = categories;
     try{
-      Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_RESTAURANTS_BY_CITY_AND_CATEGORIES, params);
+      Response response = await _restManager.makeGetRequest(
+          ADDRESS_STORE_SERVER,
+          REQUEST_SEARCH_RESTAURANTS_BY_CITY_AND_CATEGORIES,
+          params);
       if( response.statusCode == HttpStatus.noContent ) return List.generate(0, (index) => null);
-      return List<Restaurant>.from(json.decode(response.body).map((i) => Restaurant.fromJson(i)).toList());
+      else if( response.statusCode == HttpStatus.ok )
+        return List<Restaurant>.from(json.decode(response.body).map((i) => Restaurant.fromJson(i)).toList());
+      else return null;
     }
     catch (e) {
       print(e);
-      return List.generate(0, (index) => null);
+      return null;
     }
   }
 
@@ -161,32 +207,59 @@ class Model {
       Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_REVIEW_BY_RESTAURANT+"/$id");
       if( response.statusCode == HttpStatus.noContent )
         return List.generate(0, (index) => null);
-      return List<Review>.from(json.decode(response.body).map((i) => Review.fromJson(i)).toList());
+      else if( response.statusCode == HttpStatus.ok )
+        return List<Review>.from(json.decode(response.body).map((i) => Review.fromJson(i)).toList());
+      else return null;
     }
     catch (e) {
       print(e);
-      return List.generate(0, (index) => null);
+      return null;
     }
   }
-
   // SUPPORT
+  Future<void> loadRestaurantReviews(Restaurant restaurant) async{
+    List<Review> reviews = await Model.sharedInstance.searchReviewByRestaurant(restaurant.id);
+    restaurant.setRatings(reviews);
+  }
 
-  Future<void> loadRestaurantReviews(List<Restaurant> restaurants) async{
+
+  Future<void> loadRestaurantsReviews(List<Restaurant> restaurants) async{
     for(Restaurant restaurant in restaurants){
-      List<Review> reviews = await Model.sharedInstance.searchReviewByRestaurant(restaurant.id);
-      restaurant.setRatings(reviews);
+      await loadRestaurantReviews(restaurant);
     }
   }
 
-  // USER
-
-  Future<User> searchUserByEmail(String email) async {
-    Map<String, dynamic> params = Map();
-    params["email"] = email;
+  // RESERVATION
+  Future<BookingResponse> newReservation(Reservation reservation) async{
     try{
-      Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_USER_BY_EMAIL, params);
-      if( response.statusCode == HttpStatus.notFound ) return null;
-      return User.fromJson(jsonDecode(response.body));
+      Response response = await _restManager.makePostRequest(ADDRESS_STORE_SERVER, REQUEST_NEW_RESERVATION, reservation);
+      if( response.statusCode == HttpStatus.created ){
+        Reservation created = Reservation.fromJson(json.decode(response.body));
+        return new BookingResponse(BOOKING_RESPONSE_STATE.CREATED, reservation: created);
+      }
+      else if( response.statusCode == HttpStatus.conflict ){
+        if( response.body == ERROR_RESERVATION_ALREADY_EXIST )
+          return new BookingResponse(BOOKING_RESPONSE_STATE.ERROR_RESERVATION_ALREADY_EXIST);
+        else if( response.body == ERROR_SEATS_UNAVAILABLE )
+          return new BookingResponse(BOOKING_RESPONSE_STATE.ERROR_SEATS_UNAVAILABLE);
+      }
+      else return new BookingResponse(BOOKING_RESPONSE_STATE.ERROR_UNKNOWN);
+    }catch(e){
+      return null;
+    }
+  }
+
+  Future<List<TableService>> getTableServicesByDate(Restaurant restaurant, String formattedDate) async{
+    Map<String, String> params = Map();
+    params["restaurant_id"] = restaurant.id.toString();
+    params["date"] = formattedDate;
+    try{
+      Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_GET_SERVICES_BY_DATE, params);
+      if( response.statusCode == HttpStatus.noContent )
+        return List.generate(0, (index) => null);
+      else if( response.statusCode == HttpStatus.ok )
+        return List<TableService>.from(json.decode(response.body).map((i) => TableService.fromJson(i)).toList());
+      else return null;
     }
     catch (e) {
       print(e);
@@ -194,29 +267,72 @@ class Model {
     }
   }
 
-  // Future<List<Product>> searchProduct(String name) async {
-  //   Map<String, String> params = Map();
-  //   params["name"] = name;
-  //   try {
-  //     return List<Product>.from(json.decode(await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_PRODUCTS, params)).map((i) => Product.fromJson(i)).toList());
-  //   }
-  //   catch (e) {
-  //     return null; // not the best solution
-  //   }
-  // }
+  Future<int> getSeatsAvailable(TableService service, String formattedDate, String formattedTime) async{
+    Map<String, String> params = Map();
+    params["service_id"] = service.id.toString();
+    params["date"] = formattedDate;
+    params["time"] = formattedTime;
+    try{
+      Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_GET_AVAILABILITY, params);
+      if( response.statusCode == HttpStatus.ok )
+        return int.parse(response.body);
+      else return null;
+    }
+    catch (e) {
+      print(e);
+      return null;
+    }
+  }
 
-  // Future<User> addUser(User user) async {
-  //   try {
-  //     String rawResult = await _restManager.makePostRequest(ADDRESS_STORE_SERVER, REQUEST_ADD_USER, user);
-  //     if ( rawResult.contains(RESPONSE_ERROR_MAIL_USER_ALREADY_EXISTS) ) {
-  //       return null; // not the best solution
-  //     }
-  //     else {
-  //       return User.fromJson(jsonDecode(rawResult));
-  //     }
-  //   }
-  //   catch (e) {
-  //     return null; // not the best solution
-  //   }
-  // }
+  // USER
+  Future<User> searchUserByEmail(String email) async {
+    Map<String, dynamic> params = Map();
+    params["email"] = email;
+    try{
+      Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_SEARCH_USER_BY_EMAIL, params);
+      print(response.statusCode);
+      if( response.statusCode == HttpStatus.notFound ) return null;
+      return User.fromJson(jsonDecode(response.body));
+    }
+    catch (e) {
+      print("searchUserByEmail exception: "+ e);
+      return null;
+    }
+  }
+
+  Future<List<Reservation>> getReservations(User user) async {
+    try{
+      int id = user.id;
+      Response response = await _restManager.makeGetRequest(ADDRESS_STORE_SERVER, REQUEST_GET_RESERVATIONS+"/$id");
+      if( response.statusCode == HttpStatus.noContent )
+        return List.generate(0, (index) => null);
+      else if( response.statusCode == HttpStatus.ok )
+        return List<Reservation>.from(json.decode(response.body).map((i) => Reservation.fromJson(i)).toList());
+      else return null;
+    }
+    catch (e) {
+      print(e);
+      return null;
+    }
+  }
+
+
+  Future<ReviewResponse> newReview(Review review) async{
+    try{
+      // reservation attribute of Review object is ignored by server
+      int reservationId = review.reservation.id;
+      Response response = await _restManager.makePostRequest(ADDRESS_STORE_SERVER, REQUEST_POST_REVIEW+"/$reservationId", review);
+      if( response.statusCode == HttpStatus.created ){
+        Review created = Review.fromJson(json.decode(response.body));
+        return new ReviewResponse(REVIEW_RESPONSE_STATE.CREATED, review: created);
+      }
+      else if( response.statusCode == HttpStatus.conflict ){
+        if( response.body == ERROR_REVIEW_ALREADY_EXISTS )
+          return new ReviewResponse(REVIEW_RESPONSE_STATE.ERROR_REVIEW_ALREADY_EXIST);
+      }
+      else return new ReviewResponse(REVIEW_RESPONSE_STATE.ERROR_UNKNOWN);
+    }catch(e){
+      return null;
+    }
+  }
 }

@@ -3,11 +3,10 @@ import 'package:client/UI/home.dart';
 import 'package:client/UI/screens/login/login_screen.dart';
 import 'package:client/UI/support/constants.dart';
 import 'package:client/UI/support/theme.dart';
-import 'package:client/model/support/login_result.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class App extends StatefulWidget {
   App({Key key}) : super(key: key);
@@ -16,16 +15,15 @@ class App extends StatefulWidget {
   _AppState createState() => _AppState();
 }
 class _AppState extends State<App> {
-  bool _logged = false;
 
   @override
   void initState() {
     super.initState();
-    checkUserLoggedIn();
   }
 
   @override
   Widget build(BuildContext context) {
+    Locale defaultLanguage = Locale("it");
     WidgetsFlutterBinding.ensureInitialized();
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -33,20 +31,35 @@ class _AppState extends State<App> {
       debugShowCheckedModeBanner: false,
       title: APP_NAME,
       theme: theme(),
-      home: _logged ? Home() : LoginScreen(),
+      home: LoginScreen(),
       localizationsDelegates: [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
+      supportedLocales: [
+        const Locale('it', null),
+        const Locale('en', null)
+      ],
+      localeResolutionCallback: (locale, supportedLocales) {
+        if (defaultLanguage != null) {
+          Intl.defaultLocale = defaultLanguage.toLanguageTag();
+          return defaultLanguage;
+        }
+        if (locale == null) {
+          Intl.defaultLocale = supportedLocales.first.toLanguageTag();
+          return supportedLocales.first;
+        }
+        for (var supportedLocale in supportedLocales) {
+          if (supportedLocale.languageCode == locale.languageCode) {
+            Intl.defaultLocale = supportedLocale.toLanguageTag();
+            return supportedLocale;
+          }
+        }
+        Intl.defaultLocale = supportedLocales.first.toLanguageTag();
+        return supportedLocales.first;
+      },
     );
-  }
-
-  Future<void> checkUserLoggedIn() async {
-    SharedPreferences userData = await SharedPreferences.getInstance();
-    setState(() {
-      _logged = userData.getString('token') != null;
-    });
   }
 
 }

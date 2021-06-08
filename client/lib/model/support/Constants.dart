@@ -4,12 +4,12 @@ const int MAX_NOP = 15;
 // addresses
 
 // ANDROID DEVICE DEBUGGING
-const String ADDRESS_STORE_SERVER = "192.168.1.54:8080";
-const String ADDRESS_AUTHENTICATION_SERVER = "192.168.1.54:8444";
+// const String ADDRESS_STORE_SERVER = "192.168.1.54:8080";
+// const String ADDRESS_AUTHENTICATION_SERVER = "192.168.1.54:8180";
 
 // WEB DEBUGGING
-// const String ADDRESS_STORE_SERVER = "localhost:8080";
-// const String ADDRESS_AUTHENTICATION_SERVER = "localhost:8444";
+const String ADDRESS_STORE_SERVER = "localhost:8080";
+const String ADDRESS_AUTHENTICATION_SERVER = "localhost:8180";
 
 
 // authentication
@@ -33,8 +33,25 @@ const String REQUEST_SEARCH_REVIEW_BY_RESTAURANT = "/api/search/review";
 // USER CONTROLLER
 const String REQUEST_ADD_USER = "api/users/new";
 const String REQUEST_SEARCH_USER_BY_EMAIL = "/api/users";
+const String REQUEST_GET_RESERVATIONS = "/api/users/reservations";
+const String REQUEST_POST_REVIEW = "/api/users/post-review";
+
+// RESERVATION CONTROLLER
+const String REQUEST_GET_SERVICES_BY_DATE = "/api/booking/services";
+const String REQUEST_GET_AVAILABILITY = "/api/booking/availability";
+const String REQUEST_NEW_RESERVATION = "/api/booking/new";
+
+// ERROR MESSAGE
+const String ERROR_RESERVATION_ALREADY_EXIST = "ERROR_RESERVATION_ALREADY_EXIST";
+const String ERROR_SEATS_UNAVAILABLE = "ERROR_SEATS_UNAVAILABLE";
+const String ERROR_REVIEW_ALREADY_EXISTS = "ERROR_REVIEW_ALREADY_EXISTS";
+
 
 // roles
+
+// STORAGE
+const String STORAGE_REFRESH_TOKEN = "refresh_token";
+const String STORAGE_EMAIL = "email";
 
 // categories
 const List<String> categories = ["pizza", "sushi", "pub", "grill", "cafe"];

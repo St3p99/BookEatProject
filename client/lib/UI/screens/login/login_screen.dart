@@ -25,6 +25,12 @@ class _LoginScreenState extends State<LoginScreen>{
   String _password;
   final _formKey = GlobalKey<FormState>();
 
+  @override
+  void initState() {
+    checkAutoLogIn();
+    super.initState();
+  }
+
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return SafeArea(
@@ -54,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen>{
                                 height: SizeConfig.screenHeight*0.2,
                                 child: AutoSizeText(APP_NAME,
                                       style: TextStyle(
-                                          color: Colors.grey,
+                                          color: kTextLightColor,
                                           fontSize: 70.0, fontWeight: FontWeight.bold)
                                 ),
                               ),
@@ -78,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen>{
                                   labelText: 'EMAIL',
                                   labelStyle: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.grey),
+                                      color: kTextLightColor),
                               ),
                               validator: (value) => _validateEmail(value),
                               onSaved: (value) => _email = value,
@@ -91,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen>{
                                   labelText: 'PASSWORD',
                                   labelStyle: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.grey),
+                                      color: kTextLightColor),
                               ),
                               validator: (value) => _validatePassword(value),
                               onSaved: (value) => _password = value,
@@ -131,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen>{
                         +" "+APP_NAME+"?",
                         style: TextStyle(),
                       ),
-                      SizedBox(height: getProportionateScreenHeight(5)),
+                      SizedBox(height: getProportionateScreenWidth(15)),
                       InkWell(
                         onTap: () {
                           //TODO: navigator.push -> signupScreen
@@ -203,30 +209,21 @@ class _LoginScreenState extends State<LoginScreen>{
             duration: Duration(seconds: 1),
           )
       );
-      // // TEMPORANEO
-      User user = await Model.sharedInstance.searchUserByEmail(_email);
-      print(user);
-      if(user != null){
-        user.setUserPrefs();
-        Navigator.push(context, PageTransition(
-            type: PageTransitionType.leftToRight,
-            child: Home()));
-      }
 
-      // _getToken(); //TODO:
-      // switch( _loginResult){
-      //   case LoginResult.logged:
-      //     User user = await Model.sharedInstance.searchUserByEmail(_email);
-      //     user.setUserPrefs();
-      //     Navigator.push(context, PageTransition(
-      //         type: PageTransitionType.leftToRight,
-      //         child: Home()
-      //     )); break;
-      //   case LoginResult.error_wrong_credentials:
-      //     _showErrorDialog("WRONG CREDENTIALS", "message..");
-      //     break;
-      //   default:_showErrorDialog("KEYCLOAK ERROR", "messagge..");
-      // }
+      await _getToken();
+      switch( _loginResult){
+        case LoginResult.logged:{
+          Navigator.push(context, PageTransition(
+              type: PageTransitionType.leftToRight,
+              child: Home()
+          )); } break;
+        case LoginResult.error_wrong_credentials: {
+          _showErrorDialog("WRONG CREDENTIALS", "message..");
+        }break;
+        default: {
+          _showErrorDialog("KEYCLOAK ERROR", "messagge..");
+        } break;
+      }
     }
   }
 
@@ -235,5 +232,15 @@ class _LoginScreenState extends State<LoginScreen>{
     setState(() {
       _loginResult = loginResult;
     });
+  }
+
+  void checkAutoLogIn() async {
+    bool result = await Model.sharedInstance.autoLogin();
+    if ( result ) {
+      print("AUTOLOGIN");
+      Navigator.push(context, PageTransition(
+          type: PageTransitionType.leftToRight,
+          child: Home()));
+    }
   }
 }

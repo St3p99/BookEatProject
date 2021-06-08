@@ -10,9 +10,12 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import javax.ejb.Local;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
 
@@ -28,13 +31,13 @@ import java.util.Date;
         name = "reservation",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        name = "reservation_customer_id_restaurant_id_booking_timestamp_unique",
-                        columnNames = {"customer_id", "restaurant_id", "reservation_date", "start_time"}
+                        name = "customer_id_table_service_id_reservation_date",
+                        columnNames = {"customer_id", "table_service_id", "reservation_date"}
                 )
         },
         schema = "booking_system"
 )
-public class Reservation {
+public class Reservation  implements Comparable<Reservation>{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -59,8 +62,9 @@ public class Reservation {
 
     @Basic
     @NotNull
-    @Column(name = "n_guests", nullable = false)
-    private int nGuests;
+    @Positive
+    @Column(name = "guests", nullable = false)
+    private int guests;
 
     @Basic
     @Column(name = "rejected", nullable = false)
@@ -81,8 +85,12 @@ public class Reservation {
     private TableService tableService;
 
     @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    @JsonIgnore
+//    @ToString.Exclude
+//    @JsonIgnore
     @OneToOne(mappedBy = "reservation")
     public Review review;
+
+    public int compareTo(Reservation r) {
+        return LocalDateTime.of(date, startTime).compareTo(LocalDateTime.of(r.date, r.startTime));
+    }
 }

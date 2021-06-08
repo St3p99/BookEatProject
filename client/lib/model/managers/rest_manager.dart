@@ -11,8 +11,10 @@ class RestManager {
   ErrorListener delegate;
   String token;
 
-  Future<Response> _makeRequest(String serverAddress, String servicePath, String method, TypeHeader type, {Map<String, dynamic> value, dynamic body}) async {
-    Uri uri = Uri.https(serverAddress, servicePath, value);
+  Future<Response> _makeRequest(String serverAddress, String servicePath, String method, TypeHeader type, {Map<String, dynamic> value, dynamic body, bool httpsEnabled = false}) async {
+    Uri uri;
+    if( httpsEnabled ) uri = Uri.https(serverAddress, servicePath, value);
+    else uri = Uri.http(serverAddress, servicePath, value);
     bool errorOccurred = false;
     while (true) {
       print(uri.toString());
@@ -28,10 +30,11 @@ class RestManager {
           contentType = "application/x-www-form-urlencoded";
           formattedBody = body.keys.map((key) => "$key=${body[key]}").join("&");
         }
+
         // setting headers
         Map<String, String> headers = Map();
-        if(contentType != null)
-          headers[HttpHeaders.contentTypeHeader] = contentType;
+
+        headers[HttpHeaders.contentTypeHeader] = contentType;
         if (token != null) {
           headers[HttpHeaders.authorizationHeader] = 'bearer $token';
         }
@@ -68,9 +71,10 @@ class RestManager {
           delegate.errorNetworkGone();
           errorOccurred = false;
         }
+        print(response.statusCode);
         return response;
       } catch (err) {
-        print(err);
+        print('RestManager: makeRequest exception: ' + err);
         if (delegate != null && !errorOccurred) {
           delegate.errorNetworkOccurred(MESSAGE_CONNECTION_ERROR);
           errorOccurred = true;
@@ -83,9 +87,8 @@ class RestManager {
 
   Future<Response> makePostRequest(
       String serverAddress, String servicePath, dynamic body,
-      {Map<String, dynamic> value,
-       TypeHeader type = TypeHeader.json}) async {
-    return _makeRequest(serverAddress, servicePath, "post", type, body: body, value: value);
+      {TypeHeader type = TypeHeader.json, bool httpsEnabled = false}) async {
+    return _makeRequest(serverAddress, servicePath, "post", type, body: body, httpsEnabled: httpsEnabled);
   }
 
   Future<Response> makeGetRequest(String serverAddress, String servicePath,

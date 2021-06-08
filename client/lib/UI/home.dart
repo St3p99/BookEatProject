@@ -35,8 +35,7 @@ class _HomeState extends State<Home> {
         body: PageView(
           physics: NeverScrollableScrollPhysics(),
           children:[
-            DiscoverScreen(pageController: pageController),
-            SearchScreen(), ReservationsScreen(), ProfileScreen()
+            DiscoverScreen(), SearchScreen(), ReservationsScreen(), ProfileScreen()
           ],
           controller: pageController,
           onPageChanged: (page){

@@ -16,13 +16,12 @@ class RestaurantCard extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: SizeConfig.screenHeight * 0.25,
-        padding: const EdgeInsets.all(10),
         child: Stack(
           children: <Widget>[
             Align(
               alignment: Alignment.centerRight,
               child: Container(
+                height: SizeConfig.screenHeight * 0.25,
                 width: SizeConfig.screenWidth * .5,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -43,7 +42,7 @@ class RestaurantCard extends StatelessWidget{
               alignment: Alignment.centerLeft,
               child: Container(
                 width: SizeConfig.screenWidth * .6,
-                height: SizeConfig.screenHeight * 0.21,
+                // height: SizeConfig.screenHeight * 0.21,
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
                     color: Colors.white,
@@ -64,9 +63,9 @@ class RestaurantCard extends StatelessWidget{
                           child: Text(
                             "${restaurant.name}",
                             style: TextStyle(
-                                color: kTextColor,
+                                color: kTextLightColor,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 20),
+                                fontSize: 25),
                             textAlign: TextAlign.left,
                           ),
                         ),
@@ -81,7 +80,7 @@ class RestaurantCard extends StatelessWidget{
                             style: TextStyle(
                                 color: kTextColor,
                                 fontWeight: FontWeight.normal,
-                                fontSize: 15),
+                                fontSize: 16),
                             textAlign: TextAlign.left,
                           ),
                         ),
@@ -96,7 +95,7 @@ class RestaurantCard extends StatelessWidget{
                             style: TextStyle(
                                 color: kTextColor,
                                 fontWeight: FontWeight.normal,
-                                fontSize: 12),
+                                fontSize: 16),
                             textAlign: TextAlign.left,
                           ),
                         ),
@@ -111,8 +110,8 @@ class RestaurantCard extends StatelessWidget{
                             rating: ((restaurant.avgFoodRating +
                                 restaurant.avgLocationRating +
                                 restaurant.avgServiceRating )/3),
-                            itemSize: 15,
-                            itemCount: ratingItems,
+                            itemSize: 20,
+                            itemCount: RATING_ITEMS,
                             itemBuilder: (context, index) =>
                                 Icon(Icons.star, color: kPrimaryColor),
                           ),

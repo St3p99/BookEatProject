@@ -9,6 +9,16 @@ class DateTimeUtils{
     return DateFormat(DATE_FORMAT).format(date);
   }
 
+  static DateTime getDateTime(String formattedDate, String formattedTime){
+    int year = int.parse(formattedDate.split("-")[0]);
+    int month = int.parse(formattedDate.split("-")[1]);
+    int day = int.parse(formattedDate.split("-")[2]);
+    int hour = int.parse(formattedTime.split(":")[0]);
+    int minute = int.parse(formattedTime.split(":")[1]);
+    int second = int.parse(formattedTime.split(":")[2]);
+    return new DateTime(year, month, day, hour, minute, second );
+  }
+
   static String formatDate(DateTime date){
     return DateFormat(DATE_FORMAT).format(date);
   }
@@ -19,13 +29,40 @@ class DateTimeUtils{
         minute: int.parse(hms.split(":")[1]));
   }
 
-  static String DateTimeCustomToString(TimeOfDay timeOfDay){
-    return "${timeOfDay.hour}:${timeOfDay.minute}";
+  static TimeOfDay timeOfDayNow(){
+    DateTime now = DateTime.now();
+    return new TimeOfDay(
+        hour: now.hour,
+        minute: now.minute
+    );
+  }
+
+  static TimeOfDay roundCeil30Minutes(TimeOfDay tod){
+    int hour = tod.hour;
+    int minute = tod.minute;
+    print(minute);
+    if( minute > 0 && minute < 30  )
+      return tod.replacing(minute: 30);
+    else if( minute > 30 )
+      return tod.replacing(hour: hour+1, minute: 00);
+    else return tod;
   }
 
 
-  static String TODCustomToString(TimeOfDay timeOfDay){
-    return "${timeOfDay.hour}:${timeOfDay.minute}";
+  static String TODToStringHM(TimeOfDay timeOfDay){
+    String hour = timeOfDay.hour >= 10 ?
+                timeOfDay.hour.toString() : "0"+timeOfDay.hour.toString();
+    String minute = timeOfDay.minute >= 10 ?
+                timeOfDay.minute.toString() : "0"+timeOfDay.minute.toString();
+    return "$hour:$minute";
+  }
+
+  static String TODToStringHMS(TimeOfDay timeOfDay){
+    String hour = timeOfDay.hour >= 10 ?
+    timeOfDay.hour.toString() : "0"+timeOfDay.hour.toString();
+    String minute = timeOfDay.minute >= 10 ?
+    timeOfDay.minute.toString() : "0"+timeOfDay.minute.toString();
+    return "$hour:$minute:00";
   }
 
   static String hmsTohm(String hms){
@@ -36,7 +73,17 @@ class DateTimeUtils{
     return "$hm:00";
   }
 
-    static int compareToDate(DateTime date1, DateTime date2){
+  static TimeOfDay addMinutes(TimeOfDay tod, int adding){
+    int hour = tod.minute + adding >= TimeOfDay.minutesPerHour ?
+              (tod.hour+1)
+              : tod.hour;
+    int minute = tod.minute + adding >= TimeOfDay.minutesPerHour ?
+        (tod.minute + adding - TimeOfDay.minutesPerHour)
+        : tod.minute + adding ;
+    return tod.replacing(hour: hour, minute: minute);
+  }
+
+  static int compareToDate(DateTime date1, DateTime date2){
       if(date1.year < date2.year){
         return -1;
       }
@@ -50,5 +97,17 @@ class DateTimeUtils{
         return 1;
       }
       else return date1.day - date2.day;
+  }
+
+  static int compareToTimeOfDay(TimeOfDay tod1, TimeOfDay tod2){
+    print("1: $tod1 2: $tod2");
+    if(tod1.hour < tod2.hour){
+      return -1;
     }
+    else if(tod1.hour > tod2.hour){
+      return 1;
+    }
+    else
+      return tod1.minute - tod2.minute;
+  }
 }

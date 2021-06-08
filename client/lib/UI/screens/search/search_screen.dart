@@ -28,7 +28,6 @@ class _SearchScreenState extends State<SearchScreen> {
   List<Restaurant> _searchResult;
   final _formKey = GlobalKey<FormState>();
 
-
   @override
   void initState() {
     super.initState();
@@ -41,125 +40,95 @@ class _SearchScreenState extends State<SearchScreen> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Column(
-              children: [
-                top(),
-                Padding(padding: EdgeInsets.only(bottom: 20)),
-                bottom()
-              ]
-            ),
-        ),
+        body: Column(children: [
+          top(),
+          Padding(padding: EdgeInsets.only(bottom: 10)),
+          bottom()
+        ]),
+      ),
     );
   }
 
-  Widget top(){
+  Widget top() {
     return Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
+      height: SizeConfig.screenHeight * 0.25,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
             blurRadius: 5,
             spreadRadius: 5,
-            color: Colors.black12,
-          )],
-          borderRadius: BorderRadius.only(
-                bottomLeft:Radius.circular(20),
-                bottomRight:Radius.circular(20)
+            color: kPrimaryColor.withOpacity(0.2),
           ),
-        ),
-        height: SizeConfig.screenHeight*.3,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 10, 20,0),
-          child: Theme(
-            data: Theme.of(context).copyWith(primaryColor: kPrimaryColor),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: SizeConfig.screenHeight*.05,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: categories.length,
-                      itemBuilder: (BuildContext context, int index) =>
-                          _buildCategoryChip(context, index),
-                    ),
+        ],
+        borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+        child: Theme(
+          data: Theme.of(context).copyWith(primaryColor: kPrimaryColor),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  onChanged: (value) => _what = value,
+                  onFieldSubmitted: (value) => _focusNode.requestFocus(),
+                  decoration: InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(
+                          horizontal: getProportionateScreenHeight(20),
+                          vertical: getProportionateScreenWidth(9)),
+                      hintText: AppLocalizations.of(context)
+                          .translate("search_what")
+                          .capitalize,
+                      prefixIcon: Icon(Icons.search)),
+                ),
+                Padding(padding: EdgeInsets.only(bottom: 10)),
+                TextFormField(
+                  autofocus: true,
+                  focusNode: _focusNode,
+                  validator: (value) {
+                    if (value.isEmpty)
+                      return "* " +
+                          AppLocalizations.of(context)
+                              .translate("required")
+                              .capitalize;
+                    else
+                      return null;
+                  },
+                  onChanged: (value) => _where = value,
+                  onFieldSubmitted: (value) => _search(),
+                  decoration: InputDecoration(
+                      contentPadding: EdgeInsets.symmetric(
+                          horizontal: getProportionateScreenHeight(20),
+                          vertical: getProportionateScreenWidth(9)),
+                      hintText: AppLocalizations.of(context)
+                          .translate("search_where")
+                          .capitalize,
+                      prefixIcon: Icon(Icons.map)),
+                ),
+                Padding(padding: EdgeInsets.only(bottom: 20)),
+                Container(
+                  height: SizeConfig.screenHeight * .05,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: categories.length,
+                    itemBuilder: (BuildContext context, int index) =>
+                        _buildCategoryChip(context, index),
                   ),
-                  SizedBox(height: getProportionateScreenHeight(20)),
-                  TextFormField(
-                      onChanged: (value) => _what = value,
-                      onFieldSubmitted: (value) => _focusNode.requestFocus(),
-                      decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                              horizontal: getProportionateScreenWidth(20),
-                              vertical: getProportionateScreenWidth(9)),
-                          hintText: AppLocalizations.of(context)
-                              .translate("search_what")
-                              .capitalize,
-                          prefixIcon: Icon(Icons.search)),
-                    ),
-                  SizedBox(height: getProportionateScreenHeight(20)),
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: SizeConfig.screenWidth* .7,
-                          child: TextFormField(
-                            autofocus: true,
-                            focusNode: _focusNode,
-                            validator: (value) {
-                              if (value.isEmpty)
-                                return "* " +
-                                    AppLocalizations.of(context)
-                                        .translate("required")
-                                        .capitalize;
-                              else
-                                return null;
-                            },
-                            onChanged: (value) => _where = value,
-                            onFieldSubmitted: (value) => _search(),
-                            decoration: InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(
-                                    horizontal:
-                                    getProportionateScreenWidth(20),
-                                    vertical: getProportionateScreenWidth(9)),
-                                hintText: AppLocalizations.of(context)
-                                    .translate("search_where")
-                                    .capitalize,
-                                prefixIcon: Icon(Icons.map)),
-                          ),
-                        ),
-                        Padding(padding: EdgeInsets.only(right: 20)),
-                        GestureDetector(
-                            onTap: () => _search(),
-                            child: Container(
-                              height: SizeConfig.screenHeight*.07,
-                              width: SizeConfig.screenWidth*.15,
-                              child: Material(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  shadowColor: kPrimaryColor.withOpacity(0.5),
-                                  color: kPrimaryColor,
-                                  elevation: 5.0,
-                                  child: Icon(
-                                    Icons.search_rounded,
-                                    color: Colors.white,
-                                  )),
-                            )
-                        ),
-                      ],
-                    ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _buildCategoryChip(BuildContext context, int index) {
@@ -167,7 +136,9 @@ class _SearchScreenState extends State<SearchScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: FilterChip(
           label: Text(
-            AppLocalizations.of(context).translate(categories[index]).toUpperCase(),
+            AppLocalizations.of(context)
+                .translate(categories[index])
+                .toUpperCase(),
             style: TextStyle(
               color: Colors.grey[700],
               fontWeight: _categoriesFilter.contains(categories[index])
@@ -213,46 +184,50 @@ class _SearchScreenState extends State<SearchScreen> {
       List<Restaurant> result;
       if (_categoriesFilter.isEmpty && (_what == null || _what == '')) {
         result = await Model.sharedInstance.searchRestaurantByCity(_where);
-      }
-      else if (_categoriesFilter.isEmpty) {
-        result = await Model.sharedInstance.searchRestaurantByNameAndCity(_what, _where);
-      }
-      else if (_what == null || _what == '') {
-          result = await Model.sharedInstance.searchRestaurantByCityAndCategories(_where, _categoriesFilter);
-      }
-      else {
-          result = await Model.sharedInstance.searchRestaurantByNameAndCityAndCategories(_what, _where, _categoriesFilter);
+      } else if (_categoriesFilter.isEmpty) {
+        result = await Model.sharedInstance
+            .searchRestaurantByNameAndCity(_what, _where);
+      } else if (_what == null || _what == '') {
+        result = await Model.sharedInstance
+            .searchRestaurantByCityAndCategories(_where, _categoriesFilter);
+      } else {
+        result = await Model.sharedInstance
+            .searchRestaurantByNameAndCityAndCategories(
+                _what, _where, _categoriesFilter);
       }
 
-      await Model.sharedInstance.loadRestaurantReviews(result);
+      await Model.sharedInstance.loadRestaurantsReviews(result);
 
       setState(() {
         _searchResult = result;
         _searching = false;
       });
     }
+  }
 
-  }
   Widget bottom() {
-    return _searching ?
-    CircularProgressIndicator() // searching
-        : _searchResult == null ?
-    SizedBox.shrink() : _searchResult.isEmpty ?
-    noResult() : buildContent();
+    return _searching
+        ? CircularProgressIndicator() // searching
+        : _searchResult == null
+            ? SizedBox.shrink()
+            : _searchResult.isEmpty
+                ? noResult()
+                : buildContent();
   }
-  Widget noResult(){
+
+  Widget noResult() {
     return Center(
         child: SizedBox(
             height: SizeConfig.screenHeight * 0.10,
             width: SizeConfig.screenHeight * 0.10,
-            child: Text(AppLocalizations.of(context).translate("no_result").capitalize+"!")
-        )
-    );
+            child: Text(
+                AppLocalizations.of(context).translate("no_result").capitalize +
+                    "!")));
   }
 
-  Widget buildContent(){
+  Widget buildContent() {
     return Container(
-      height: SizeConfig.screenHeight*.55,
+      height: SizeConfig.screenHeight * .65,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,14 +240,12 @@ class _SearchScreenState extends State<SearchScreen> {
                 itemCount: _searchResult.length,
                 itemBuilder: (context, index) {
                   return GestureDetector(
-                      onTap: () =>
-                          Navigator.push(
+                      onTap: () => Navigator.push(
                               context,
                               CupertinoPageRoute(
-                                  builder: (context) =>
-                                  new DetailScreen(
-                                      restaurant: _searchResult[index]))).then((
-                              value) => setState(() {})),
+                                  builder: (context) => new DetailScreen(
+                                      restaurant: _searchResult[index])))
+                          .then((value) => setState(() {})),
                       child: RestaurantCard(restaurant: _searchResult[index]));
                 }),
           ),
@@ -281,5 +254,3 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 }
-
-

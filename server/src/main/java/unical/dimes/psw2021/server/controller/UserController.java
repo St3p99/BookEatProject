@@ -13,6 +13,7 @@ import unical.dimes.psw2021.server.model.Reservation;
 import unical.dimes.psw2021.server.model.Restaurant;
 import unical.dimes.psw2021.server.model.Review;
 import unical.dimes.psw2021.server.model.User;
+import unical.dimes.psw2021.server.repository.ReservationRepository;
 import unical.dimes.psw2021.server.service.AccountingService;
 import unical.dimes.psw2021.server.service.UserService;
 import unical.dimes.psw2021.server.support.ResponseMessage;
@@ -22,11 +23,11 @@ import unical.dimes.psw2021.server.support.exception.UniqueKeyViolationException
 import javax.validation.Valid;
 
 import java.net.ConnectException;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
 @RequestMapping("${base-url}/users")
-//@PreAuthorize("hasAuthority('user')")
 public class UserController {
     private final AccountingService accountingService;
     private final UserService userService;
@@ -60,14 +61,14 @@ public class UserController {
     }
 
     @Operation(method="postReview", summary = "Post a review")
-    @PostMapping(path = "/post-review")
-    public ResponseEntity postReview(@RequestBody @Valid Review review, BindingResult bindingResult) {
+    @PostMapping(path = "/post-review/{reservation_id}")
+    @PreAuthorize("hasAuthority('user')")
+    public ResponseEntity postReview(@RequestBody @Valid Review review, BindingResult bindingResult, @PathVariable(name = "reservation_id") Long reservationId) {
         if (bindingResult.hasErrors()) return ResponseEntity.badRequest().build();
-
         try{
             return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(userService.postReview(review));
+                    .body(userService.postReview(review, reservationId));
         }catch (UniqueKeyViolationException e){
             return new ResponseEntity<>(new ResponseMessage("ERROR_REVIEW_ALREADY_EXISTS"), HttpStatus.CONFLICT);
         }catch (PostingDateTimeException e){
@@ -80,6 +81,7 @@ public class UserController {
      **/
     @Operation(method="getUser")
     @GetMapping(value = "/{user_id}")
+    @PreAuthorize("hasAuthority('user')")
     public ResponseEntity getUser(@PathVariable("user_id") Long id) {
         try {
             return ResponseEntity.ok(userService.getById(id));
@@ -92,24 +94,27 @@ public class UserController {
 
     @Operation(method="getUserByEmail")
     @GetMapping()
+    @PreAuthorize("hasAuthority('user')")
     public ResponseEntity getUserByEmail(@RequestParam("email") String email) {
         System.out.println("getUser: "+email);
         try {
             return ResponseEntity.ok(userService.getByEmail(email));
         } catch (ResourceNotFoundException e) {
             return new ResponseEntity<>(
-                    new ResponseMessage("User not found!"),
                     HttpStatus.NOT_FOUND);
         }
     }
 
     @Operation(method = "getReservations", summary = "Return reservations of the user with user_id")
     @GetMapping(path = "/reservations/{user_id}")
+    @PreAuthorize("hasAuthority('user')")
     public ResponseEntity getReservations(@PathVariable("user_id") Long id){
+        System.out.println("getReservations");
         try {
             List<Reservation> result = userService.showReservations(id);
             if (result.size() <= 0)
                 return ResponseEntity.noContent().build();
+            result.sort(Collections.reverseOrder());
             return ResponseEntity.ok(result);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -121,6 +126,7 @@ public class UserController {
      **/
     @Operation(method = "deleteUser", summary = "Delete a user")
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority('user')")
     public ResponseEntity deleteUser(@PathVariable Long id){
         accountingService.deleteUser(id);
         return ResponseEntity.noContent().build();

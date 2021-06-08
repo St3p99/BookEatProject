@@ -65,9 +65,10 @@ public class Review {
     private String reviewText;
 
 
-    @NotNull
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "reservation_id", nullable = false)
+    @JsonIgnore
+    @ToString.Exclude
     public Reservation reservation;
 
     public void setFoodRating(int foodRating) throws RatingOutOfBoundException {

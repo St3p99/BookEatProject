@@ -3,15 +3,11 @@ package unical.dimes.psw2021.server.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import unical.dimes.psw2021.server.model.Reservation;
 import unical.dimes.psw2021.server.model.Restaurant;
 import unical.dimes.psw2021.server.model.Review;
 import unical.dimes.psw2021.server.service.RestaurantService;
-
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.springframework.beans.support.PagedListHolder.DEFAULT_PAGE_SIZE;
@@ -118,7 +114,6 @@ public class SearchController {
         System.out.println("getReviews: "+id);
         try {
             List<Review> result = restaurantService.showReview(id);
-            System.out.println(result);
             if (result.size() <= 0)
                 return ResponseEntity.noContent().build();
             return ResponseEntity.ok(result);

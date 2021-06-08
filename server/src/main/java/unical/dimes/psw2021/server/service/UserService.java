@@ -55,14 +55,14 @@ public class UserService {
     }
 
     @Transactional
-    public Review postReview(Review review) throws UniqueKeyViolationException, PostingDateTimeException {
-        Optional<Reservation> optReservation = reservationRepository.findByIdAndRejectedFalse(review.getReservation().getId());
+    public Review postReview(Review review, long reservationId) throws UniqueKeyViolationException, PostingDateTimeException {
+        Optional<Reservation> optReservation = reservationRepository.findByIdAndRejectedFalse(reservationId);
         if (optReservation.isEmpty()) throw new ResourceNotFoundException();
         Reservation reservation = optReservation.get();
 
-        //check posting after 12h + reservation date and time
+        //check posting reservation date and time
         LocalDateTime reservationDateTime = LocalDateTime.of(reservation.getDate(), reservation.getStartTime());
-        if( LocalDateTime.now().minusHours(2).compareTo(reservationDateTime) >= 0 ){
+        if( LocalDateTime.now().compareTo(reservationDateTime) <= 0 ){
             throw new PostingDateTimeException();
         }
 

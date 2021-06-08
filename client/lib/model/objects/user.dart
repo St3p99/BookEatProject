@@ -1,3 +1,4 @@
+import 'package:client/model/managers/persistent_storage_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class User {
@@ -38,13 +39,18 @@ class User {
     'city': city
   };
 
- void setUserPrefs() async{
-   SharedPreferences userData = await SharedPreferences.getInstance();
-   userData.setInt("id", id);
-   userData.setString("email", email);
-   userData.setString("firstName", firstName);
-   userData.setString("lastName", lastName);
-   userData.setString("phone", phone);
-   userData.setString("city", city);
+ @override
+  String toString() {
+    return 'User{id: $id, firstName: $firstName, lastName: $lastName, phone: $phone, email: $email, city: $city}';
+ }
+
+  void setUserPrefs() async{
+   PersistentStorageManager persistentStorageManager = PersistentStorageManager();
+   persistentStorageManager.setInt("id", id);
+   persistentStorageManager.setString("email", email);
+   persistentStorageManager.setString("firstName", firstName);
+   persistentStorageManager.setString("lastName", lastName);
+   persistentStorageManager.setString("phone", phone);
+   persistentStorageManager.setString("city", city);
  }
 }

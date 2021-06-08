@@ -156,6 +156,9 @@
     <orderEntry type="library" name="Maven: org.webjars:swagger-ui:3.38.0" level="project" />
     <orderEntry type="library" name="Maven: org.webjars:webjars-locator-core:0.46" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.11.4" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.4.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.14" level="project" />
+    <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.15" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-security:2.4.5" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-aop:5.3.6" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-config:5.4.6" level="project" />
@@ -169,9 +172,6 @@
     <orderEntry type="library" name="Maven: org.keycloak:keycloak-spring-boot-2-adapter:9.0.2" level="project" />
     <orderEntry type="library" name="Maven: org.keycloak:keycloak-spring-boot-adapter-core:9.0.2" level="project" />
     <orderEntry type="library" name="Maven: org.keycloak:keycloak-authz-client:9.0.2" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.13" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.14" level="project" />
-    <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.15" level="project" />
     <orderEntry type="library" name="Maven: org.keycloak:spring-boot-container-bundle:9.0.2" level="project" />
     <orderEntry type="library" name="Maven: org.keycloak:keycloak-spring-security-adapter:9.0.2" level="project" />
     <orderEntry type="library" name="Maven: org.keycloak:keycloak-adapter-spi:9.0.2" level="project" />

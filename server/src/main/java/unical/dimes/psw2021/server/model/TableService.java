@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -20,6 +21,7 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode()
+@ToString
 /* lombok auto-generated code */
 
 @Entity
@@ -33,7 +35,7 @@ import java.util.Set;
         },
         schema = "booking_system"
 )
-public class TableService {
+public class TableService implements Comparable<TableService>{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -72,5 +74,10 @@ public class TableService {
     @Version
     @Column(name = "version", nullable = false)
     @JsonIgnore
+    @ToString.Exclude
     private long version;
+
+    public int compareTo(TableService t) {
+        return this.startTime.compareTo(t.startTime);
+    }
 }

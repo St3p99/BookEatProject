@@ -9,11 +9,8 @@ import '../../home.dart';
 
 class DiscoverScreen extends StatelessWidget {
   const DiscoverScreen({
-    Key key,
-    @required this.pageController,
+    Key key
   }) : super(key: key);
-
-  final PageController pageController;
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +18,7 @@ class DiscoverScreen extends StatelessWidget {
       child: Column(
         children: <Widget>[
           DiscoverHeader(context),
+          SizedBox(height: 1),
           RestaurantsInArea(),
           // SizedBox(height: getProportionateScreenWidth(30)),
         ],
@@ -31,11 +29,22 @@ class DiscoverScreen extends StatelessWidget {
   Widget DiscoverHeader(BuildContext context) {
     return Container(
         height: SizeConfig.screenHeight*0.1,
-        color: Colors.transparent,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              blurRadius: 5,
+              spreadRadius: 5,
+              color: kPrimaryColor.withOpacity(0.2),
+            ),
+          ],
+          borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
+        ),
         child: Padding(
           padding: const EdgeInsets.only(left:15, right: 10),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 APP_NAME,
@@ -44,15 +53,7 @@ class DiscoverScreen extends StatelessWidget {
                   fontSize: 35,
                   fontWeight: FontWeight.w800,
                 ),
-              ),
-              IconButton(
-                  icon: Icon(
-                    Icons.search,
-                    color: kPrimaryColor,
-                    size: 30,
-                  ),
-                  onPressed: () => pageController.jumpToPage(NavPage.search.index)
-              ),
+              )
             ],
           ),
         )

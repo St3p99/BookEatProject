@@ -17,7 +17,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findByUserAndRejectedFalse(User user);
     List<Reservation> findByRestaurantAndDateAndRejectedFalse(Restaurant restaurant, LocalDate date);
     List<Reservation> findByTableServiceAndRejectedFalse(TableService tableService);
-    boolean existsByUserAndRestaurantAndDateAndStartTimeAndRejectedFalse(User user, Restaurant restaurant, LocalDate date, LocalTime startTime);
+    boolean existsByUserAndTableServiceAndDateAndRejectedFalse(User user, TableService tableService, LocalDate date);
 
     Optional<Reservation> findByIdAndRejectedFalse(Long id);
 
