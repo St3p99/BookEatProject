@@ -40,6 +40,7 @@ const String REQUEST_POST_REVIEW = "/api/users/post-review";
 const String REQUEST_GET_SERVICES_BY_DATE = "/api/booking/services";
 const String REQUEST_GET_AVAILABILITY = "/api/booking/availability";
 const String REQUEST_NEW_RESERVATION = "/api/booking/new";
+const String REQUEST_DELETE_RESERVATION = "/api/booking/delete";
 
 // ERROR MESSAGE
 const String ERROR_RESERVATION_ALREADY_EXIST = "ERROR_RESERVATION_ALREADY_EXIST";
