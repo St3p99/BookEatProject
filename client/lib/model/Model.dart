@@ -249,6 +249,15 @@ class Model {
     }
   }
 
+  Future<void> deleteReservation(Reservation reservation) async{
+    try{
+      int id = reservation.id;
+      Response response = await _restManager.makeDeleteRequest(ADDRESS_STORE_SERVER, REQUEST_DELETE_RESERVATION+"/$id");
+    }catch(e){
+      return null;
+    }
+  }
+
   Future<List<TableService>> getTableServicesByDate(Restaurant restaurant, String formattedDate) async{
     Map<String, String> params = Map();
     params["restaurant_id"] = restaurant.id.toString();

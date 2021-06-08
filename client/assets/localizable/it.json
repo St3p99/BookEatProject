@@ -24,6 +24,8 @@
   "description":"descrizione",
   "book_now": "prenota ora",
   "confirm": "conferma",
+  "cancel": "annulla",
+  "yes": "si",
   "reviews": "recensioni",
   "on_bookit": "su BookIT",
   "unregistred": "non sei registrato su",
@@ -55,5 +57,7 @@
   "incoming": "in arrivo",
   "review": "recensisci",
   "guests": "persone",
-  "my_rating": "la mia valutazione"
+  "my_rating": "la mia valutazione",
+  "delete_reservation": "elimina",
+  "delete_reservation_text": "sei sicuro di voler eliminare la prenotazione?"
 }

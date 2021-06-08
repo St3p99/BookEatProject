@@ -24,6 +24,8 @@
   "description":"description",
   "book_now": "book now",
   "confirm": "confirm",
+  "cancel": "cancel",
+  "yes": "yes",
   "reviews": "reviews",
   "on_bookit": "on BookIT",
   "unregistred": "new to",
@@ -56,5 +58,7 @@
   "incoming": "incoming",
   "review": "review",
   "guests": "guests",
-  "my_rating":"my_rating"
+  "my_rating":"my_rating",
+  "delete_reservation": "delete",
+  "delete_reservation_text": "are you sure you want to delete this reservation?"
 }

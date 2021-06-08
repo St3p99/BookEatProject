@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:client/UI/behaviors/app_localizations.dart';
 import 'package:client/UI/screens/reservations/components/rating_dialog.dart';
+import 'package:client/UI/screens/reservations/reservations_screen.dart';
 import 'package:client/UI/support/constants.dart';
 import 'package:client/model/Model.dart';
 import 'package:client/model/objects/reservation.dart';
@@ -9,31 +10,30 @@ import 'package:client/model/support/review_response.dart';
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:client/model/support/extensions/string_capitalization.dart';
+import 'package:page_transition/page_transition.dart';
 
-class RatingHandle extends StatefulWidget {
+class RatingHandler extends StatefulWidget {
   final Reservation reservation;
+  final Function() notifyParent;
 
-  const RatingHandle({
+  const RatingHandler({
     Key key,
     @required this.reservation,
+    @required this.notifyParent
   }) : super(key: key);
 
   @override
-  _RatingHandleState createState() => _RatingHandleState(reservation);
+  _RatingHandlerState createState() => _RatingHandlerState();
 }
 
-class _RatingHandleState extends State<RatingHandle> {
-  Reservation reservation;
-  int foodRating = -1;
-  int locationRating = -1;
-  int serviceRating = -1;
+class _RatingHandlerState extends State<RatingHandler> {
+  int foodRating = MAX_RATING;
+  int locationRating = MAX_RATING;
+  int serviceRating = MAX_RATING;
   int currentRatingDialog = 0;
   String ratingDialogTitle = "food_rating";
   String submitButton = "next";
 
-  _RatingHandleState(Reservation reservation) {
-    this.reservation = reservation;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +80,7 @@ class _RatingHandleState extends State<RatingHandle> {
                           ? locationRating = rating
                           : serviceRating = rating;
                 });
+                Navigator.pop(context);
                 nextDialog();
               },
               onCancelled: () => Navigator.pop(context),
@@ -94,12 +95,13 @@ class _RatingHandleState extends State<RatingHandle> {
       if (currentRatingDialog == 0) {
         ratingDialogTitle = "location_rating";
         currentRatingDialog++;
+        showRatingDialog();
       } else if (currentRatingDialog == 1) {
         ratingDialogTitle = "service_rating";
         submitButton = "submit";
         currentRatingDialog++;
+        showRatingDialog();
       } else {
-        Navigator.pop(context);
         currentRatingDialog = 0;
         ratingDialogTitle = "food_rating";
         submitButton = "next";
@@ -114,9 +116,8 @@ class _RatingHandleState extends State<RatingHandle> {
             foodRating: foodRating,
             locationRating: locationRating,
             serviceRating: serviceRating,
-            reservation: new Reservation(id: reservation.id)));
+            reservation: new Reservation(id: widget.reservation.id)));
     handleResponse(reviewResponse);
-    setState(() {});
   }
 
   void handleResponse(ReviewResponse reviewResponse) {
@@ -160,6 +161,10 @@ class _RatingHandleState extends State<RatingHandle> {
           .capitalize,
       backgroundColor: kSecondaryColor,
       confirmBtnColor: kPrimaryColor,
+      onConfirmBtnTap: ()  {
+        widget.notifyParent();
+        Navigator.of(context).pop();
+      }
     );
   }
 }

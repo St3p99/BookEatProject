@@ -1,7 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:client/UI/behaviors/app_localizations.dart';
 import 'package:client/UI/screens/reservations/components/rating_dialog.dart';
-import 'package:client/UI/screens/reservations/components/rating_handle.dart';
+import 'package:client/UI/screens/reservations/components/rating_handler.dart';
 import 'package:client/UI/support/constants.dart';
 import 'package:client/UI/support/size_config.dart';
 import 'package:client/model/Model.dart';
@@ -14,28 +14,27 @@ import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:client/model/support/extensions/string_capitalization.dart';
 
+import 'delete_reservation_handler.dart';
+
 enum RESERVATION_STATE{INCOMING, REJECTED, PASSED}
 
 //TODO: button to delete a reservation and refactoring
 class ReservationCard extends StatefulWidget {
+  final Function() notifyParent;
   final Reservation reservation;
 
   const ReservationCard({
     Key key,
     @required this.reservation,
+    @required this.notifyParent
   }) : super(key: key);
 
   @override
-  _ReservationCardState createState() => _ReservationCardState(reservation);
+  _ReservationCardState createState() => _ReservationCardState();
 }
 
 class _ReservationCardState extends State<ReservationCard> {
-  Reservation reservation;
   RESERVATION_STATE state;
-
-  _ReservationCardState(Reservation reservation) {
-    this.reservation = reservation;
-  }
 
   @override
   void initState() {
@@ -95,8 +94,16 @@ class _ReservationCardState extends State<ReservationCard> {
               right: 5,
               child: Visibility(
                 visible: state == RESERVATION_STATE.PASSED &&
-                    reservation.review == null,
-                child: RatingHandle(reservation: reservation,)
+                    widget.reservation.review == null,
+                child: RatingHandler(reservation: widget.reservation, notifyParent: widget.notifyParent)
+              ),
+            ),
+            Positioned(
+              bottom: 0,
+              right: 5,
+              child: Visibility(
+                  visible: state == RESERVATION_STATE.INCOMING,
+                  child: DeleteReservationHandler(reservation: widget.reservation, notifyParent: widget.notifyParent)
               ),
             ),
             Align(
@@ -107,7 +114,7 @@ class _ReservationCardState extends State<ReservationCard> {
                   Row(
                     children: [
                         AutoSizeText(
-                          "${reservation.restaurant.name}",
+                          "${widget.reservation.restaurant.name}",
                           style: TextStyle(
                               color: kTextLightColor,
                               fontWeight: FontWeight.bold,
@@ -120,7 +127,7 @@ class _ReservationCardState extends State<ReservationCard> {
                   Row(
                     children: [
                       AutoSizeText(
-                          "${reservation.date}",
+                          "${widget.reservation.date}",
                           style: TextStyle(
                               color: kTextColor,
                               fontWeight: FontWeight.normal,
@@ -129,7 +136,7 @@ class _ReservationCardState extends State<ReservationCard> {
                         ),
                       Padding(padding: EdgeInsets.only(right: 10)),
                       AutoSizeText(
-                          "${DateTimeUtils.hmsTohm(reservation.startTime)}",
+                          "${DateTimeUtils.hmsTohm(widget.reservation.startTime)}",
                           style: TextStyle(
                               color: kTextColor,
                               fontWeight: FontWeight.normal,
@@ -138,7 +145,7 @@ class _ReservationCardState extends State<ReservationCard> {
                         ),
                       Padding(padding: EdgeInsets.only(right: 10)),
                        AutoSizeText(
-                          "${reservation.guests} "+AppLocalizations.of(context).translate("guests"),
+                          "${widget.reservation.guests} "+AppLocalizations.of(context).translate("guests"),
                           style: TextStyle(
                               color: kTextColor,
                               fontWeight: FontWeight.normal,
@@ -147,7 +154,7 @@ class _ReservationCardState extends State<ReservationCard> {
                         ),
                     ],
                   ),
-                  reservation.review == null
+                  widget.reservation.review == null
                         ? SizedBox.shrink()
                         : Column(
                         children: [
@@ -168,15 +175,15 @@ class _ReservationCardState extends State<ReservationCard> {
                                 _buildWidgetRating(
                                     AppLocalizations.of(context)
                                         .translate("food_rating"),
-                                    reservation.review.foodRating),
+                                    widget.reservation.review.foodRating),
                                 _buildWidgetRating(
                                     AppLocalizations.of(context)
                                         .translate("location_rating"),
-                                    reservation.review.locationRating),
+                                    widget.reservation.review.locationRating),
                                 _buildWidgetRating(
                                     AppLocalizations.of(context)
                                         .translate("service_rating"),
-                                    reservation.review.serviceRating)
+                                    widget.reservation.review.serviceRating)
                               ],
                             ),
                         ],
@@ -228,12 +235,12 @@ class _ReservationCardState extends State<ReservationCard> {
 
   int cmpDateTime() {
     DateTime dateTime =
-        DateTimeUtils.getDateTime(reservation.date, reservation.startTime);
+        DateTimeUtils.getDateTime(widget.reservation.date, widget.reservation.startTime);
     return dateTime.compareTo(DateTime.now());
   }
 
   RESERVATION_STATE _checkState() {
-    if(reservation.rejected)
+    if(widget.reservation.rejected)
       return RESERVATION_STATE.REJECTED;
     else if( cmpDateTime() >= 0 ){
       return RESERVATION_STATE.INCOMING;

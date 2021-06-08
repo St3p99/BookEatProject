@@ -110,7 +110,7 @@ class _ReservationsContentPageState extends State<ReservationsContentPage> {
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                          child: ReservationCard(reservation: reservations[index]),
+                          child: ReservationCard(reservation: reservations[index], notifyParent: () => _pullData()),
                     ));
                   }),
     );
