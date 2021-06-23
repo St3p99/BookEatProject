@@ -1,5 +1,4 @@
 import 'package:client/model/objects/review.dart';
-import 'package:client/model/objects/table_service.dart';
 
 class Restaurant {
   int id;
@@ -17,22 +16,22 @@ class Restaurant {
   double avgServiceRating = -1;
   double avgLocationRating = -1;
 
-  Restaurant(
-      {this.id,
-      this.name,
-      this.city,
-      this.category,
-      this.address,
-      this.description,
-      this.publicPhone,
-      this.privateMail,
-      this.publicMail,
-      this.seatingCapacity,
-      this.nReviews=0,
-      this.avgFoodRating=-1,
-      this.avgServiceRating=-1,
-      this.avgLocationRating=-1,
-      });
+  Restaurant({
+    this.id,
+    this.name,
+    this.city,
+    this.category,
+    this.address,
+    this.description,
+    this.publicPhone,
+    this.privateMail,
+    this.publicMail,
+    this.seatingCapacity,
+    this.nReviews = 0,
+    this.avgFoodRating = -1,
+    this.avgServiceRating = -1,
+    this.avgLocationRating = -1,
+  });
 
   factory Restaurant.fromJson(Map<String, dynamic> json) {
     return Restaurant(
@@ -62,20 +61,21 @@ class Restaurant {
         'seatingCapacity': seatingCapacity,
       };
 
-  void setRatings(List<Review> reviews){
+  void setRatings(List<Review> reviews) {
     this.nReviews = reviews.length;
-    this.avgFoodRating = 0; this.avgServiceRating = 0; this.avgLocationRating = 0;
-    for( int i = 0; i < reviews.length; i++ ){
+    this.avgFoodRating = 0;
+    this.avgServiceRating = 0;
+    this.avgLocationRating = 0;
+    for (int i = 0; i < reviews.length; i++) {
       this.avgFoodRating += reviews[i].foodRating;
       this.avgLocationRating += reviews[i].locationRating;
       this.avgServiceRating += reviews[i].serviceRating;
     }
-    if(reviews.length != 0){
-      this.avgFoodRating = this.avgFoodRating/reviews.length;
-      this.avgLocationRating = this.avgLocationRating/reviews.length;
-      this.avgServiceRating = this.avgServiceRating/reviews.length;
+    if (reviews.length != 0) {
+      this.avgFoodRating = this.avgFoodRating / reviews.length;
+      this.avgLocationRating = this.avgLocationRating / reviews.length;
+      this.avgServiceRating = this.avgServiceRating / reviews.length;
     }
-
   }
 
   @override

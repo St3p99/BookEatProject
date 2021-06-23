@@ -11,10 +11,16 @@ class RestManager {
   ErrorListener delegate;
   String token;
 
-  Future<Response> _makeRequest(String serverAddress, String servicePath, String method, TypeHeader type, {Map<String, dynamic> value, dynamic body, bool httpsEnabled = false}) async {
+  Future<Response> _makeRequest(
+      String serverAddress, String servicePath, String method, TypeHeader type,
+      {Map<String, dynamic> value,
+      dynamic body,
+      bool httpsEnabled = false}) async {
     Uri uri;
-    if( httpsEnabled ) uri = Uri.https(serverAddress, servicePath, value);
-    else uri = Uri.http(serverAddress, servicePath, value);
+    if (httpsEnabled)
+      uri = Uri.https(serverAddress, servicePath, value);
+    else
+      uri = Uri.http(serverAddress, servicePath, value);
     bool errorOccurred = false;
     while (true) {
       print(uri.toString());
@@ -87,8 +93,11 @@ class RestManager {
 
   Future<Response> makePostRequest(
       String serverAddress, String servicePath, dynamic body,
-      {TypeHeader type = TypeHeader.json, bool httpsEnabled = false}) async {
-    return _makeRequest(serverAddress, servicePath, "post", type, body: body, httpsEnabled: httpsEnabled);
+      {Map<String, dynamic> value,
+      TypeHeader type = TypeHeader.json,
+      bool httpsEnabled = false}) async {
+    return _makeRequest(serverAddress, servicePath, "post", type,
+        body: body, value: value, httpsEnabled: httpsEnabled);
   }
 
   Future<Response> makeGetRequest(String serverAddress, String servicePath,
@@ -106,5 +115,4 @@ class RestManager {
     return _makeRequest(serverAddress, servicePath, "delete", type,
         value: value);
   }
-
 }

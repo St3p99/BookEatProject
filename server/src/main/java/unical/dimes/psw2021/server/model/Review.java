@@ -10,7 +10,6 @@ import unical.dimes.psw2021.server.support.exception.RatingOutOfBoundException;
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /* lombok auto-generated code */
@@ -34,63 +33,56 @@ import javax.validation.constraints.NotNull;
 public class Review {
     private static final int MIN_RATING = 0;
     private static final int MAX_RATING = 5;
-
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "reservation_id", nullable = false)
+    @JsonIgnore
+    @ToString.Exclude
+    public Reservation reservation;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-
     @NotNull
     @Min(MIN_RATING)
     @Max(MAX_RATING)
     @Basic
     @Column(name = "food_rating", nullable = false)
     private int foodRating;
-
     @NotNull
     @Min(MIN_RATING)
     @Max(MAX_RATING)
     @Basic
     @Column(name = "service_rating", nullable = false)
     private int serviceRating;
-
     @NotNull
     @Min(MIN_RATING)
     @Max(MAX_RATING)
     @Basic
     @Column(name = "location_rating", nullable = false)
     private int locationRating;
-
     @Column(name = "review_text")
     private String reviewText;
 
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "reservation_id", nullable = false)
-    @JsonIgnore
-    @ToString.Exclude
-    public Reservation reservation;
-
     public void setFoodRating(int foodRating) throws RatingOutOfBoundException {
-        if (! checkBounds(foodRating) )
+        if (!checkBounds(foodRating))
             throw new RatingOutOfBoundException();
         this.foodRating = foodRating;
     }
 
     public void setLocationRating(int locationRating) throws RatingOutOfBoundException {
-        if (! checkBounds(locationRating) )
+        if (!checkBounds(locationRating))
             throw new RatingOutOfBoundException();
         this.locationRating = locationRating;
     }
 
     public void setServiceRating(int serviceRating) throws RatingOutOfBoundException {
-        if( ! checkBounds(serviceRating) )
+        if (!checkBounds(serviceRating))
             throw new RatingOutOfBoundException();
         this.serviceRating = serviceRating;
     }
 
-    private boolean checkBounds(int rating){
-         return rating <= MAX_RATING && rating >= MIN_RATING;
+    private boolean checkBounds(int rating) {
+        return rating <= MAX_RATING && rating >= MIN_RATING;
     }
 }
 

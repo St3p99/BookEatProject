@@ -3,7 +3,10 @@ package unical.dimes.psw2021.server.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.support.MutableSortDefinition;
 import org.springframework.beans.support.PagedListHolder;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,9 +60,22 @@ public class RestaurantService {
         return pagedResult.hasContent() ? pagedResult.getContent() : new ArrayList<>();
     }
 
+
+    public List<Restaurant> showRestaurantPagedByNameAndCityAndCategories(String name, String city, List<String> categories, int pageNumber, int pageSize, String sortBy) {
+        Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy));
+        Page<Restaurant> pagedResult = restaurantRepository.findByNameIgnoreCaseContainingAndCityIgnoreCaseAndCategoryIn(name, city, categories, paging);
+        return pagedResult.hasContent() ? pagedResult.getContent() : new ArrayList<>();
+    }
+
+    public List<Restaurant> showRestaurantPagedByCityAndCategories(String city, List<String> categories, int pageNumber, int pageSize, String sortBy) {
+        Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy));
+        Page<Restaurant> pagedResult = restaurantRepository.findByCityIgnoreCaseAndCategoryIn(city, categories, paging);
+        return pagedResult.hasContent() ? pagedResult.getContent() : new ArrayList<>();
+    }
+
     @Transactional(readOnly = true)
     public List<Restaurant> showRestaurantByNameAndCity(String name, String city) {
-        return restaurantRepository.findByNameIgnoreCaseContainingAndCityIgnoreCase(name,city);
+        return restaurantRepository.findByNameIgnoreCaseContainingAndCityIgnoreCase(name, city);
     }
 
     @Transactional(readOnly = true)
@@ -69,24 +85,13 @@ public class RestaurantService {
 
     @Transactional(readOnly = true)
     public List<Restaurant> showRestaurantByNameAndCityAndCategories(String name, String city, List<String> categories) {
-        return restaurantRepository.findByNameIgnoreCaseContainingAndCityIgnoreCaseAndCategoryIn(name,city, categories);
+        return restaurantRepository.findByNameIgnoreCaseContainingAndCityIgnoreCaseAndCategoryIn(name, city, categories);
     }
 
     @Transactional(readOnly = true)
     public List<Restaurant> showRestaurantByCityAndCategories(String city, List<String> categories) {
         return restaurantRepository.findByCityIgnoreCaseAndCategoryIn(city, categories);
     }
-
-//    @Transactional
-//    public Restaurant addRestaurant(Restaurant newRestaurant) throws UniqueKeyViolationException {
-//
-//        if (restaurantRepository.existsByNameAndCityAndAddress(newRestaurant.getName(),
-//                newRestaurant.getCity(),
-//                newRestaurant.getAddress())) {
-//            throw new UniqueKeyViolationException();
-//        }
-//        return restaurantRepository.save(newRestaurant);
-//    }
 
     @Transactional
     public void deleteRestaurant(Restaurant r) {
@@ -170,12 +175,12 @@ public class RestaurantService {
     }
 
     @Transactional(readOnly = true)
-    public List<Reservation> showReservations(Long id,  int pageNumber, int pageSize, String sortBy) throws ResourceNotFoundException {
+    public List<Reservation> showReservations(Long id, int pageNumber, int pageSize, String sortBy) throws ResourceNotFoundException {
         Optional<Restaurant> optRestaurant = restaurantRepository.findById(id);
-        if(optRestaurant.isEmpty()) throw new ResourceNotFoundException();
+        if (optRestaurant.isEmpty()) throw new ResourceNotFoundException();
 
         List<Reservation> reservations = optRestaurant.get().getReservations();
-        if( reservations.isEmpty() ) return reservations;
+        if (reservations.isEmpty()) return reservations;
 
         PagedListHolder<Reservation> pagedResult = new PagedListHolder(reservations);
         pagedResult.setPageSize(pageSize);
@@ -185,9 +190,9 @@ public class RestaurantService {
     }
 
     @Transactional(readOnly = true)
-    public List<Reservation> showReservationsByRestaurantAndDate(Long restaurantId, LocalDate date) throws ResourceNotFoundException{
+    public List<Reservation> showReservationsByRestaurantAndDate(Long restaurantId, LocalDate date) throws ResourceNotFoundException {
         Optional<Restaurant> optRestaurant = restaurantRepository.findById(restaurantId);
-        if(optRestaurant.isEmpty()) throw new ResourceNotFoundException();
+        if (optRestaurant.isEmpty()) throw new ResourceNotFoundException();
 
         List<Reservation> reservations = reservationRepository.findByRestaurantAndDateAndRejectedFalse(optRestaurant.get(), date);
         return reservations;

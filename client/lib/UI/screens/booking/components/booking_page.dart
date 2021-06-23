@@ -1,22 +1,19 @@
+import 'package:client/UI/behaviors/app_localizations.dart';
 import 'package:client/UI/support/constants.dart';
-import 'package:client/UI/support/theme.dart';
+import 'package:client/UI/support/size_config.dart';
 import 'package:client/model/Model.dart';
 import 'package:client/model/objects/reservation.dart';
+import 'package:client/model/objects/restaurant.dart';
 import 'package:client/model/objects/table_service.dart';
 import 'package:client/model/objects/user.dart';
 import 'package:client/model/support/booking_response.dart';
 import 'package:client/model/support/constants.dart';
 import 'package:client/model/support/date_time_utils.dart';
 import 'package:client/model/support/extensions/string_capitalization.dart';
-import 'package:client/UI/behaviors/app_localizations.dart';
-import 'package:client/UI/support/size_config.dart';
-import 'package:client/model/objects/restaurant.dart';
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
-
 
 class BookingPage extends StatefulWidget {
   final Restaurant restaurant;
@@ -48,31 +45,52 @@ class _BookingPageState extends State<BookingPage> {
   bool gettingAvailability = false;
 
   TextEditingController notesController = TextEditingController();
-  _BookingPageState(Restaurant restaurant){
+
+  _BookingPageState(Restaurant restaurant) {
     this.restaurant = restaurant;
   }
 
   next() {
-    if(currentStep + 1 != N_STEP)
-        goTo(currentStep + 1);
+    if (currentStep + 1 != N_STEP) goTo(currentStep + 1);
   }
 
   goTo(int step) {
-    switch(step){
-      case 1:{
-        searchServicesByDate();
-      }break;
-      case 2: {// TimeStep
-        if(selectedService == -1)
-          return;
-        generateTimes();
-      }break;
-      case 3: { // NOPStep
-        if(selectedTime == -1)
-          return;
-        getAvailability();
-        } break;
-      default: break;
+    switch (step) {
+      case 0:
+        {
+          setState(() {
+            selectedService = -1;
+            selectedTime = -1;
+            selectedNOP = -1;
+          });
+        }
+        break;
+      case 1:
+        {
+          setState(() {
+            selectedTime = -1;
+            selectedNOP = -1;
+          });
+          searchServicesByDate();
+        }
+        break;
+      case 2:
+        {
+          // TimeStep
+          if (selectedService == -1) return;
+          setState(() {
+            selectedNOP = -1;
+          });
+          generateTimes();
+        }
+        break;
+      case 3:
+        {
+          // NOPStep
+          if (selectedTime == -1) return;
+          getAvailability();
+        }
+        break;
     }
     setState(() {
       currentStep = step;
@@ -85,14 +103,15 @@ class _BookingPageState extends State<BookingPage> {
     }
   }
 
-  Future<void> searchServicesByDate() async{
+  Future<void> searchServicesByDate() async {
     setState(() {
       searchingServices = true;
       tableServices = null;
     });
 
-    print('booking page> getTableServiceByDate');
-    List<TableService> result = await Model.sharedInstance.getTableServicesByDate(restaurant, DateTimeUtils.getDateFormatted(selectedDate));
+    List<TableService> result = await Model.sharedInstance
+        .getTableServicesByDate(
+            restaurant, DateTimeUtils.getDateFormatted(selectedDate));
 
     setState(() {
       searchingServices = false;
@@ -100,16 +119,16 @@ class _BookingPageState extends State<BookingPage> {
     });
   }
 
-  Future<void> getAvailability() async{
+  Future<void> getAvailability() async {
     setState(() {
       gettingAvailability = false;
       seatsAvailable = null;
     });
 
     int result = await Model.sharedInstance.getSeatsAvailable(
-      tableServices[selectedService],
-      DateTimeUtils.getDateFormatted(selectedDate),
-      times[selectedTime]);
+        tableServices[selectedService],
+        DateTimeUtils.getDateFormatted(selectedDate),
+        times[selectedTime]);
 
     setState(() {
       searchingServices = false;
@@ -117,16 +136,23 @@ class _BookingPageState extends State<BookingPage> {
     });
   }
 
-  void generateTimes(){
+  void generateTimes() {
     times = List.generate(0, (index) => null);
-    TimeOfDay startTimeTOD = DateTimeUtils.timeOfDayParser(tableServices[selectedService].startTime);
-    TimeOfDay nowTODrounded = DateTimeUtils.roundCeil30Minutes(DateTimeUtils.timeOfDayNow());
-
-    TimeOfDay nextTOD = DateTimeUtils.compareToTimeOfDay(nowTODrounded, startTimeTOD) > 0 ?
-      nowTODrounded : startTimeTOD;
-    TimeOfDay endTimeTOD =  DateTimeUtils.timeOfDayParser(tableServices[selectedService].endTime);
-    while( true ){
-      if( DateTimeUtils.compareToTimeOfDay(nextTOD, endTimeTOD) > 0 ) break;
+    TimeOfDay startTimeTOD =
+        DateTimeUtils.timeOfDayParser(tableServices[selectedService].startTime);
+    TimeOfDay nextTOD = startTimeTOD;
+    if (DateTimeUtils.compareToDate(DateTime.now(), selectedDate) == 0) {
+      // se prenota per oggi e l'inizio del servizio è precedente
+      // all'orario attuale, il nextTOD è l'orario attuale arrotondato.
+      TimeOfDay nowTODrounded =
+          DateTimeUtils.roundCeil30Minutes(DateTimeUtils.timeOfDayNow());
+      if (DateTimeUtils.compareToTimeOfDay(nowTODrounded, startTimeTOD) > 0)
+        nextTOD = nowTODrounded;
+    }
+    TimeOfDay endTimeTOD =
+        DateTimeUtils.timeOfDayParser(tableServices[selectedService].endTime);
+    while (true) {
+      if (DateTimeUtils.compareToTimeOfDay(nextTOD, endTimeTOD) > 0) break;
       times.add(DateTimeUtils.TODToStringHMS(nextTOD));
       nextTOD = DateTimeUtils.addMinutes(nextTOD, 30);
     }
@@ -135,7 +161,7 @@ class _BookingPageState extends State<BookingPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: SizeConfig.screenHeight*0.8,
+      height: SizeConfig.screenHeight * 0.8,
       child: Stack(children: [
         Theme(
           data: ThemeData(
@@ -150,7 +176,8 @@ class _BookingPageState extends State<BookingPage> {
                 TimeStep(),
                 NOPStep(),
               ],
-              currentStep: currentStep, // STEP.date.index,
+              currentStep: currentStep,
+              // STEP.date.index,
               onStepContinue: next,
               onStepCancel: cancel,
               onStepTapped: (step) => goTo(step),
@@ -158,13 +185,13 @@ class _BookingPageState extends State<BookingPage> {
               physics: BouncingScrollPhysics(),
               controlsBuilder: (BuildContext context,
                   {VoidCallback onStepContinue, VoidCallback onStepCancel}) {
-                 return Row();
+                return Row();
               },
             ),
           ),
         ),
         Visibility(
-          visible: currentStep+1 == N_STEP && selectedNOP!=-1,
+          visible: currentStep + 1 == N_STEP && selectedNOP != -1,
           child: Positioned(
             right: 20,
             bottom: 20,
@@ -188,65 +215,80 @@ class _BookingPageState extends State<BookingPage> {
     );
   }
 
-  Future<void> book() async{
+  Future<void> book() async {
     Reservation newReservation = new Reservation(
         tableService: new TableService(id: tableServices[selectedService].id),
         guests: selectedNOP,
         startTime: times[selectedTime],
         date: DateTimeUtils.getDateFormatted(selectedDate),
         user: new User(id: Model.sharedInstance.currentUser.id));
-    BookingResponse bookingResponse = await Model.sharedInstance.newReservation(newReservation);
+    BookingResponse bookingResponse =
+        await Model.sharedInstance.newReservation(newReservation);
     handleResponse(bookingResponse);
   }
 
-  void handleResponse(BookingResponse bookingResponse){
-    switch(bookingResponse.state){
-      case BOOKING_RESPONSE_STATE.CREATED:{
+  void handleResponse(BookingResponse bookingResponse) {
+    switch (bookingResponse.state) {
+      case BOOKING_RESPONSE_STATE.CREATED:
+        {
           _successDialog();
-      } break;
-      case BOOKING_RESPONSE_STATE.ERROR_SEATS_UNAVAILABLE:{
-          _errorDialog(AppLocalizations.of(context).translate("no_seats_left").capitalize);
-      } break;
-      case BOOKING_RESPONSE_STATE.ERROR_RESERVATION_ALREADY_EXIST:{
-          _errorDialog(AppLocalizations.of(context).translate("already_booked").capitalize);
-      } break;
-      case BOOKING_RESPONSE_STATE.ERROR_UNKNOWN:{
+        }
+        break;
+      case BOOKING_RESPONSE_STATE.ERROR_SEATS_UNAVAILABLE:
+        {
+          _errorDialog(AppLocalizations.of(context)
+              .translate("no_seats_left")
+              .capitalize);
+        }
+        break;
+      case BOOKING_RESPONSE_STATE.ERROR_RESERVATION_ALREADY_EXIST:
+        {
+          _errorDialog(AppLocalizations.of(context)
+              .translate("already_booked")
+              .capitalize);
+        }
+        break;
+      case BOOKING_RESPONSE_STATE.ERROR_UNKNOWN:
+        {
           _errorDialog("");
-      } break;
+        }
+        break;
     }
   }
 
-  _errorDialog(String text){
+  _errorDialog(String text) {
     CoolAlert.show(
         context: context,
         type: CoolAlertType.error,
         backgroundColor: kSecondaryColor,
         confirmBtnColor: kPrimaryColor,
-        title: AppLocalizations.of(context).translate("error").toUpperCase()+"!",
-        text: text
-    );
+        title:
+            AppLocalizations.of(context).translate("error").toUpperCase() + "!",
+        text: text);
   }
 
-   _successDialog() {
-      CoolAlert.show(
-          context: context,
-          type: CoolAlertType.success,
-          title: AppLocalizations.of(context).translate("success_title").toUpperCase()+"!",
-          text: AppLocalizations.of(context).translate("booking_success_text").capitalize,
-          backgroundColor: kSecondaryColor,
-          confirmBtnColor: kPrimaryColor,
-
-          onConfirmBtnTap: () => {
-            Navigator.pop(context),Navigator.pop(context)
-          }
-      );
+  _successDialog() {
+    CoolAlert.show(
+        context: context,
+        type: CoolAlertType.success,
+        title: AppLocalizations.of(context)
+                .translate("success_title")
+                .toUpperCase() +
+            "!",
+        text: AppLocalizations.of(context)
+            .translate("booking_success_text")
+            .capitalize,
+        backgroundColor: kSecondaryColor,
+        confirmBtnColor: kPrimaryColor,
+        onConfirmBtnTap: () =>
+            {Navigator.pop(context), Navigator.pop(context)});
   }
-
 
   _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
         context: context,
-        initialDate: DateTime.now(), // Refer step 1
+        initialDate: DateTime.now(),
+        // Refer step 1
         firstDate: DateTime.now(),
         lastDate: DateTime(DateTime.now().year + 1),
         builder: (BuildContext context, Widget child) {
@@ -286,7 +328,7 @@ class _BookingPageState extends State<BookingPage> {
                           ? AppLocalizations.of(context)
                               .translate("tomorrow")
                               .toUpperCase()
-                          : DateTimeUtils.getDateFormatted(DateTime.now()),
+                          : DateTimeUtils.getDateFormatted(selectedDate),
                   style: TextStyle(color: Colors.grey[800]),
                 ),
               ),
@@ -301,24 +343,21 @@ class _BookingPageState extends State<BookingPage> {
 
   Step ServiceStep() {
     return Step(
-      title:
-      Text(
-          currentStep <= 1
+      title: Text(currentStep <= 1
           ? AppLocalizations.of(context).translate("service").capitalize
-          : "${AppLocalizations.of(context).translate("service").capitalize}: ${tableServices[selectedService].serviceName.capitalize}"
-      ),
+          : "${AppLocalizations.of(context).translate("service").capitalize}: ${tableServices[selectedService].serviceName.capitalize}"),
       isActive: currentStep >= 1,
-      content:
-        searchingServices ? CircularProgressIndicator()
-        : tableServices == null ? SizedBox.shrink()
-          : tableServices.isEmpty ? noResult()
-            : Wrap(
-                direction: Axis.horizontal,
-                children: List.generate(tableServices.length, (index) {
-                  return buildServiceChip(context, index);
-                }),
-              ),
-      );
+      content: searchingServices
+          ? CircularProgressIndicator()
+          : tableServices == null || tableServices.isEmpty
+              ? noResult()
+              : Wrap(
+                  direction: Axis.horizontal,
+                  children: List.generate(tableServices.length, (index) {
+                    return buildServiceChip(context, index);
+                  }),
+                ),
+    );
   }
 
   Widget buildServiceChip(BuildContext context, int index) {
@@ -327,17 +366,17 @@ class _BookingPageState extends State<BookingPage> {
       child: ChoiceChip(
           label: Text(
             tableServices[index].serviceName.toUpperCase(),
-            style:
-                TextStyle(
-                    color: Colors.grey[800],
-                    fontWeight: selectedService == index ? FontWeight.w900 : FontWeight.w400,
-                ),
+            style: TextStyle(
+              color: Colors.grey[800],
+              fontWeight:
+                  selectedService == index ? FontWeight.w900 : FontWeight.w400,
+            ),
           ),
           selected: selectedService == index,
           onSelected: (bool val) {
             setState(() {
               selectedService = val ? index : -1;
-              if(val) next();
+              if (val) next();
             });
           },
           backgroundColor: Colors.white,
@@ -355,13 +394,14 @@ class _BookingPageState extends State<BookingPage> {
           ? AppLocalizations.of(context).translate("time").capitalize
           : "${AppLocalizations.of(context).translate("time").capitalize}: ${DateTimeUtils.hmsTohm(times[selectedTime]).toUpperCase()}"),
       isActive: currentStep >= 2,
-      content:  times == null ? SizedBox.shrink() :
-        Wrap(
-        direction: Axis.horizontal,
-        children: List.generate(times.length, (index) {
-            return buildTimeChip(context, index);
-          }),
-      ),
+      content: times == null || times.isEmpty
+          ? noResult()
+          : Wrap(
+              direction: Axis.horizontal,
+              children: List.generate(times.length, (index) {
+                return buildTimeChip(context, index);
+              }),
+            ),
     );
   }
 
@@ -371,17 +411,17 @@ class _BookingPageState extends State<BookingPage> {
       child: ChoiceChip(
           label: Text(
             DateTimeUtils.hmsTohm(times[index]),
-            style:
-            TextStyle(
-                color: Colors.grey[800],
-                fontWeight: selectedTime == index ? FontWeight.w900 : FontWeight.w400,
+            style: TextStyle(
+              color: Colors.grey[800],
+              fontWeight:
+                  selectedTime == index ? FontWeight.w900 : FontWeight.w400,
             ),
           ),
           selected: selectedTime == index,
           onSelected: (bool val) {
             setState(() {
               selectedTime = val ? index : -1;
-              if(val) next();
+              if (val) next();
             });
           },
           backgroundColor: Colors.white,
@@ -399,16 +439,16 @@ class _BookingPageState extends State<BookingPage> {
           ? AppLocalizations.of(context).translate("nop").capitalize
           : "${AppLocalizations.of(context).translate("nop").capitalize}: ${selectedNOP}"),
       isActive: currentStep >= 3,
-      content:
-      gettingAvailability ? CircularProgressIndicator()
-          : seatsAvailable == null ? SizedBox.shrink()
-          : gettingAvailability ? noSeatsAvailable()
-          : Wrap(
-              direction: Axis.horizontal,
-              children: List.generate(seatsAvailable, (index) {
-                return buildNOPChip(context, index + 1);
-        }),
-      ),
+      content: gettingAvailability
+          ? CircularProgressIndicator()
+          : seatsAvailable == null || seatsAvailable == 0
+              ? noSeatsAvailable()
+              : Wrap(
+                  direction: Axis.horizontal,
+                  children: List.generate(seatsAvailable, (index) {
+                    return buildNOPChip(context, index + 1);
+                  }),
+                ),
     );
   }
 
@@ -421,8 +461,9 @@ class _BookingPageState extends State<BookingPage> {
             child: Text(
               (nop).toString(),
               style: TextStyle(
-                  color: Colors.grey[800],
-                  fontWeight: selectedNOP == nop ? FontWeight.w900 : FontWeight.w400,
+                color: Colors.grey[800],
+                fontWeight:
+                    selectedNOP == nop ? FontWeight.w900 : FontWeight.w400,
               ),
             ),
           ),
@@ -436,10 +477,7 @@ class _BookingPageState extends State<BookingPage> {
           selectedColor: Colors.white,
           shape: StadiumBorder(
               side: BorderSide(
-                  color: Colors.grey[800],
-                  width: selectedNOP == nop ? 3 : 1)
-          )
-      ),
+                  color: Colors.grey[800], width: selectedNOP == nop ? 3 : 1))),
     );
   }
 
@@ -448,8 +486,9 @@ class _BookingPageState extends State<BookingPage> {
         child: SizedBox(
             height: SizeConfig.screenHeight * 0.10,
             width: SizeConfig.screenHeight * 0.10,
-            child: Text(
-                AppLocalizations.of(context).translate("no_result").capitalize)));
+            child: Text(AppLocalizations.of(context)
+                .translate("no_result")
+                .capitalize)));
   }
 
   Widget noSeatsAvailable() {
@@ -457,7 +496,8 @@ class _BookingPageState extends State<BookingPage> {
         child: SizedBox(
             height: SizeConfig.screenHeight * 0.10,
             width: SizeConfig.screenHeight * 0.10,
-            child: Text(
-                AppLocalizations.of(context).translate("no_seats_available").capitalize)));
+            child: Text(AppLocalizations.of(context)
+                .translate("no_seats_left")
+                .capitalize)));
   }
 }

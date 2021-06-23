@@ -47,7 +47,6 @@ public class ReservationController {
     public ResponseEntity newReservation(
             @RequestBody @Valid Reservation reservation, BindingResult bindingResult) {
 
-        System.out.println(reservation);
         if (bindingResult.hasErrors()) return ResponseEntity.badRequest().build();
         try {
             return ResponseEntity
@@ -63,14 +62,16 @@ public class ReservationController {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body("ERROR_SEATS_UNAVAILABLE");
-        } catch ( OptimisticLockException e ){
+        } catch (OptimisticLockException e) {
             return ResponseEntity
                     .status(HttpStatus.LOCKED)
                     .body("ERROR_RESOURCE_LOCKED");
         }
     }
 
-    /** GET OPERATION **/
+    /**
+     * GET OPERATION
+     **/
     @PreAuthorize("hasAuthority('user')")
     @Operation(method = "getTableServicesByDate", summary = "Return table service available on date for the restauraunt with id")
     @GetMapping(path = "/services")
@@ -81,7 +82,7 @@ public class ReservationController {
             List<TableService> result = restaurantService.showTableServicesByDay(restaurantId, date.getDayOfWeek());
             if (result.size() <= 0)
                 return ResponseEntity.noContent().build();
-            else{
+            else {
                 Collections.sort(result);
                 return ResponseEntity.ok(result);
             }
@@ -97,23 +98,21 @@ public class ReservationController {
             @RequestParam(name = "service_id") Long serviceId,
             @RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam(name = "time") @DateTimeFormat(pattern = "HH:mm:ss") LocalTime time) {
-        System.out.println("getSeatsAvailable " + serviceId +" "+ date +" "+ time   +" ");
         try {
             return ResponseEntity.ok(reservationService.getSeatsAvailable(serviceId, date, time));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
-    /** PUT OPERATION **/
 
-    /** DELETE OPERATION **/
+    /**
+     * DELETE OPERATION
+     **/
     @PreAuthorize("hasAuthority('user')")
     @Operation(method = "deleteReservation", summary = "Delete a reservation")
-    @DeleteMapping(path = "/reservations/delete/{id}")
+    @DeleteMapping(path = "/delete/{id}")
     public ResponseEntity deleteReservation(@PathVariable Long id) {
         userService.deleteReservation(id);
         return ResponseEntity.noContent().build();
     }
-
-
 }

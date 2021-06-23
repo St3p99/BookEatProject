@@ -1,26 +1,22 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:client/UI/behaviors/app_localizations.dart';
 import 'package:client/UI/screens/reservations/components/rating_dialog.dart';
-import 'package:client/UI/screens/reservations/reservations_screen.dart';
 import 'package:client/UI/support/constants.dart';
 import 'package:client/model/Model.dart';
 import 'package:client/model/objects/reservation.dart';
 import 'package:client/model/objects/review.dart';
+import 'package:client/model/support/extensions/string_capitalization.dart';
 import 'package:client/model/support/review_response.dart';
 import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
-import 'package:client/model/support/extensions/string_capitalization.dart';
-import 'package:page_transition/page_transition.dart';
 
 class RatingHandler extends StatefulWidget {
   final Reservation reservation;
   final Function() notifyParent;
 
-  const RatingHandler({
-    Key key,
-    @required this.reservation,
-    @required this.notifyParent
-  }) : super(key: key);
+  const RatingHandler(
+      {Key key, @required this.reservation, @required this.notifyParent})
+      : super(key: key);
 
   @override
   _RatingHandlerState createState() => _RatingHandlerState();
@@ -33,7 +29,6 @@ class _RatingHandlerState extends State<RatingHandler> {
   int currentRatingDialog = 0;
   String ratingDialogTitle = "food_rating";
   String submitButton = "next";
-
 
   @override
   Widget build(BuildContext context) {
@@ -62,30 +57,31 @@ class _RatingHandlerState extends State<RatingHandler> {
         builder: (context) {
           return StatefulBuilder(builder: (context, setState) {
             return RatingDialog(
-              title: AppLocalizations.of(context)
-                  .translate(ratingDialogTitle)
-                  .capitalize,
-              message: AppLocalizations.of(context)
-                  .translate("rating_subtitle")
-                  .capitalize,
-              submitButton: AppLocalizations.of(context)
-                  .translate(submitButton)
-                  .toUpperCase(),
-              initialRating: MAX_RATING,
-              onSubmitted: (rating) {
-                setState(() {
-                  currentRatingDialog == 0
-                      ? foodRating = rating
-                      : currentRatingDialog == 1
-                          ? locationRating = rating
-                          : serviceRating = rating;
+                title: AppLocalizations.of(context)
+                    .translate(ratingDialogTitle)
+                    .capitalize,
+                message: AppLocalizations.of(context)
+                    .translate("rating_subtitle")
+                    .capitalize,
+                submitButton: AppLocalizations.of(context)
+                    .translate(submitButton)
+                    .toUpperCase(),
+                initialRating: MAX_RATING,
+                onSubmitted: (rating) {
+                  setState(() {
+                    currentRatingDialog == 0
+                        ? foodRating = rating
+                        : currentRatingDialog == 1
+                            ? locationRating = rating
+                            : serviceRating = rating;
+                  });
+                  Navigator.pop(context);
+                  nextDialog();
+                },
+                onCancelled: () {
+                  restoreDefaultValue();
+                  Navigator.pop(context);
                 });
-                Navigator.pop(context);
-                nextDialog();
-              },
-              onCancelled: () => Navigator.pop(context),
-              // image: const FlutterLogo(size: 100),
-            );
           });
         });
   }
@@ -102,12 +98,16 @@ class _RatingHandlerState extends State<RatingHandler> {
         currentRatingDialog++;
         showRatingDialog();
       } else {
-        currentRatingDialog = 0;
-        ratingDialogTitle = "food_rating";
-        submitButton = "next";
+        restoreDefaultValue();
         postReview();
       }
     });
+  }
+
+  void restoreDefaultValue() {
+    currentRatingDialog = 0;
+    ratingDialogTitle = "food_rating";
+    submitButton = "next";
   }
 
   void postReview() async {
@@ -150,21 +150,20 @@ class _RatingHandlerState extends State<RatingHandler> {
 
   _successDialog() {
     CoolAlert.show(
-      context: context,
-      type: CoolAlertType.success,
-      title: AppLocalizations.of(context)
-              .translate("success_title")
-              .toUpperCase() +
-          "!",
-      text: AppLocalizations.of(context)
-          .translate("review_success_text")
-          .capitalize,
-      backgroundColor: kSecondaryColor,
-      confirmBtnColor: kPrimaryColor,
-      onConfirmBtnTap: ()  {
-        widget.notifyParent();
-        Navigator.of(context).pop();
-      }
-    );
+        context: context,
+        type: CoolAlertType.success,
+        title: AppLocalizations.of(context)
+                .translate("success_title")
+                .toUpperCase() +
+            "!",
+        text: AppLocalizations.of(context)
+            .translate("review_success_text")
+            .capitalize,
+        backgroundColor: kSecondaryColor,
+        confirmBtnColor: kPrimaryColor,
+        onConfirmBtnTap: () {
+          widget.notifyParent();
+          Navigator.of(context).pop();
+        });
   }
 }

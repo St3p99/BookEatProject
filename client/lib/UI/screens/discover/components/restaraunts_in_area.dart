@@ -1,11 +1,10 @@
-import 'package:client/model/objects/user.dart';
-import 'package:client/model/support/extensions/string_capitalization.dart';
 import 'package:client/UI/behaviors/app_localizations.dart';
 import 'package:client/UI/components/restaurant_card.dart';
 import 'package:client/UI/support/constants.dart';
 import 'package:client/UI/support/size_config.dart';
 import 'package:client/model/Model.dart';
 import 'package:client/model/objects/restaurant.dart';
+import 'package:client/model/support/extensions/string_capitalization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -23,7 +22,11 @@ class RestaurantsInArea extends StatefulWidget {
 
 class _RestaurantsInAreaState extends State<RestaurantsInArea> {
   final RefreshController _refreshController = RefreshController();
-  Future<List<Restaurant>> result;
+  double _scrollOffset = 0;
+  ScrollController _scrollController;
+  Future<List<Restaurant>> _futureResult;
+  List<Restaurant> _data;
+  int _currentPage = 0;
 
   @override
   void initState() {
@@ -33,10 +36,12 @@ class _RestaurantsInAreaState extends State<RestaurantsInArea> {
 
   @override
   Widget build(BuildContext context) {
+    _scrollController = ScrollController(initialScrollOffset: _scrollOffset);
     return Container(
       height: SizeConfig.screenHeight * 0.83,
       child: FutureBuilder<List<Restaurant>>(
-        future: result,
+        future: _futureResult,
+        initialData: _data,
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
@@ -78,11 +83,12 @@ class _RestaurantsInAreaState extends State<RestaurantsInArea> {
       child: ListView.builder(
           physics: BouncingScrollPhysics(),
           scrollDirection: Axis.vertical,
-          itemCount: restaurants.length + 1,
+          controller: _scrollController,
+          itemCount: restaurants.length + 2,
           itemBuilder: (context, index) {
             if (index == 0)
               return _buildBanner(context, restaurants.length);
-            else {
+            else if (index < restaurants.length + 1) {
               index = index - 1;
               return GestureDetector(
                   onTap: () => Navigator.push(
@@ -92,8 +98,18 @@ class _RestaurantsInAreaState extends State<RestaurantsInArea> {
                                   restaurant: restaurants[index])))
                       .then((value) => setState(() {})),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
                       child: RestaurantCard(restaurant: restaurants[index])));
+            } else {
+              return Center(
+                child: FloatingActionButton(
+                    backgroundColor: kPrimaryColor,
+                    onPressed: () {
+                      _loadMore();
+                    },
+                    child: Icon(Icons.arrow_downward_rounded)),
+              );
             }
           }),
     );
@@ -132,16 +148,16 @@ class _RestaurantsInAreaState extends State<RestaurantsInArea> {
                       fontSize: 14),
                 ),
               ]),
-              Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                Text(
-                  "  " +
-                      length.toString() +
-                      " " +
-                      AppLocalizations.of(context).translate("result_area"),
-                  style: TextStyle(
-                      color: kTextLightColor, fontWeight: FontWeight.w400),
-                ),
-              ]),
+              // Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+              //   Text(
+              //     "  " +
+              //         length.toString() +
+              //         " " +
+              //         AppLocalizations.of(context).translate("result_area"),
+              //     style: TextStyle(
+              //         color: kTextLightColor, fontWeight: FontWeight.w400),
+              //   ),
+              // ]),
             ],
           ),
         ),
@@ -149,16 +165,50 @@ class _RestaurantsInAreaState extends State<RestaurantsInArea> {
     );
   }
 
-  Future<void> _pullData() async {
-    User currentUser = Model.sharedInstance.currentUser;
-    print(currentUser.toString());
-    List<Restaurant> freshRestaurant =
-        await Model.sharedInstance.searchRestaurantByCity(currentUser.city);
-    await Model.sharedInstance.loadRestaurantsReviews(freshRestaurant);
-    setState(() {
-      result = Future.value(freshRestaurant);
-    });
+  Future<void> _loadMore() async {
+    _currentPage++;
+    _scrollOffset = _scrollController.offset;
+    List<Restaurant> freshRestaurant = await Model.sharedInstance
+        .searchRestaurantByCity(
+            Model.sharedInstance.currentUser.city, _currentPage);
+    if (freshRestaurant.isEmpty) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(AppLocalizations.of(context)
+                  .translate("no_more_result")
+                  .capitalize),
+              actions: <Widget>[
+                TextButton(
+                  child: Text(
+                    AppLocalizations.of(context).translate("close").capitalize,
+                    style: TextStyle(color: Colors.black87),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            );
+          });
+    } else {
+      await Model.sharedInstance.loadRestaurantsReviews(freshRestaurant);
+      setState(() {
+        _data.addAll(freshRestaurant);
+        _futureResult = Future.value(_data);
+      });
+    }
   }
 
-
+  Future<void> _pullData() async {
+    List<Restaurant> freshRestaurant = await Model.sharedInstance
+        .searchRestaurantByCity(
+            Model.sharedInstance.currentUser.city, _currentPage);
+    await Model.sharedInstance.loadRestaurantsReviews(freshRestaurant);
+    setState(() {
+      _data = freshRestaurant;
+      _futureResult = Future.value(freshRestaurant);
+    });
+  }
 }

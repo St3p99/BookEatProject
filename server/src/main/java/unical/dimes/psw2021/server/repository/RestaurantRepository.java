@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import unical.dimes.psw2021.server.model.Restaurant;
+
 import java.util.List;
 
 @Repository
@@ -17,7 +18,11 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 
     List<Restaurant> findByCityIgnoreCase(String city);
 
+    Page<Restaurant> findByNameIgnoreCaseContainingAndCityIgnoreCaseAndCategoryIn(String name, String city, List<String> categories, Pageable pageable);
+
     List<Restaurant> findByNameIgnoreCaseContainingAndCityIgnoreCaseAndCategoryIn(String name, String city, List<String> categories);
+
+    Page<Restaurant> findByCityIgnoreCaseAndCategoryIn(String city, List<String> categories, Pageable pageable);
 
     List<Restaurant> findByCityIgnoreCaseAndCategoryIn(String city, List<String> categories);
 

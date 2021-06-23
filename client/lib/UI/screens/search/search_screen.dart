@@ -3,12 +3,12 @@ import 'package:client/UI/components/restaurant_card.dart';
 import 'package:client/UI/screens/detail/detail_screen.dart';
 import 'package:client/UI/support/constants.dart';
 import 'package:client/UI/support/size_config.dart';
+import 'package:client/model/Model.dart';
 import 'package:client/model/objects/restaurant.dart';
 import 'package:client/model/support/constants.dart';
 import 'package:client/model/support/extensions/string_capitalization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:client/model/Model.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({
@@ -24,21 +24,9 @@ class _SearchScreenState extends State<SearchScreen> {
   String _what;
   String _where;
   List<String> _categoriesFilter = <String>[];
-  FocusNode _focusNode;
   List<Restaurant> _searchResult;
+  int _currentPage = 0;
   final _formKey = GlobalKey<FormState>();
-
-  @override
-  void initState() {
-    super.initState();
-    _focusNode = FocusNode();
-  }
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +43,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget top() {
     return Container(
-      height: SizeConfig.screenHeight * 0.25,
+      height: SizeConfig.screenHeight * 0.28,
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -78,8 +66,8 @@ class _SearchScreenState extends State<SearchScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextFormField(
-                  onChanged: (value) => _what = value,
-                  onFieldSubmitted: (value) => _focusNode.requestFocus(),
+                  onSaved: (value) => _what = value,
+                  onFieldSubmitted: (value) => _search(),
                   decoration: InputDecoration(
                       contentPadding: EdgeInsets.symmetric(
                           horizontal: getProportionateScreenHeight(20),
@@ -92,7 +80,6 @@ class _SearchScreenState extends State<SearchScreen> {
                 Padding(padding: EdgeInsets.only(bottom: 10)),
                 TextFormField(
                   autofocus: true,
-                  focusNode: _focusNode,
                   validator: (value) {
                     if (value.isEmpty)
                       return "* " +
@@ -102,7 +89,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     else
                       return null;
                   },
-                  onChanged: (value) => _where = value,
+                  onSaved: (value) => _where = value,
                   onFieldSubmitted: (value) => _search(),
                   decoration: InputDecoration(
                       contentPadding: EdgeInsets.symmetric(
@@ -168,6 +155,63 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
+  Future<void> _loadMore() async {
+    _currentPage++;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Processing Data'),
+      duration: Duration(milliseconds: 200),
+    ));
+
+    setState(() {
+      _searching = true;
+    });
+
+    List<Restaurant> result;
+    if (_categoriesFilter.isEmpty && (_what == null || _what == '')) {
+      result = await Model.sharedInstance
+          .searchRestaurantByCity(_where, _currentPage);
+    } else if (_categoriesFilter.isEmpty) {
+      result = await Model.sharedInstance
+          .searchRestaurantByNameAndCity(_what, _where, _currentPage);
+    } else if (_what == null || _what == '') {
+      result = await Model.sharedInstance.searchRestaurantByCityAndCategories(
+          _where, _categoriesFilter, _currentPage);
+    } else {
+      result = await Model.sharedInstance
+          .searchRestaurantByNameAndCityAndCategories(
+              _what, _where, _categoriesFilter, _currentPage);
+    }
+
+    if (result.isEmpty) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(AppLocalizations.of(context)
+                  .translate("no_more_result")
+                  .capitalize),
+              actions: <Widget>[
+                TextButton(
+                  child: Text(
+                    AppLocalizations.of(context).translate("close").capitalize,
+                    style: TextStyle(color: Colors.black87),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            );
+          });
+    } else {
+      await Model.sharedInstance.loadRestaurantsReviews(result);
+      setState(() {
+        _searchResult.addAll(result);
+        _searching = false;
+      });
+    }
+  }
+
   Future<void> _search() async {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
@@ -183,19 +227,19 @@ class _SearchScreenState extends State<SearchScreen> {
 
       List<Restaurant> result;
       if (_categoriesFilter.isEmpty && (_what == null || _what == '')) {
-        result = await Model.sharedInstance.searchRestaurantByCity(_where);
+        result = await Model.sharedInstance
+            .searchRestaurantByCity(_where, _currentPage);
       } else if (_categoriesFilter.isEmpty) {
         result = await Model.sharedInstance
-            .searchRestaurantByNameAndCity(_what, _where);
+            .searchRestaurantByNameAndCity(_what, _where, _currentPage);
       } else if (_what == null || _what == '') {
-        result = await Model.sharedInstance
-            .searchRestaurantByCityAndCategories(_where, _categoriesFilter);
+        result = await Model.sharedInstance.searchRestaurantByCityAndCategories(
+            _where, _categoriesFilter, _currentPage);
       } else {
         result = await Model.sharedInstance
             .searchRestaurantByNameAndCityAndCategories(
-                _what, _where, _categoriesFilter);
+                _what, _where, _categoriesFilter, _currentPage);
       }
-
       await Model.sharedInstance.loadRestaurantsReviews(result);
 
       setState(() {
@@ -227,30 +271,44 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget buildContent() {
     return Container(
-      height: SizeConfig.screenHeight * .65,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Expanded(
-            child: ListView.builder(
-                shrinkWrap: true,
-                physics: BouncingScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                itemCount: _searchResult.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                      onTap: () => Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                  builder: (context) => new DetailScreen(
-                                      restaurant: _searchResult[index])))
-                          .then((value) => setState(() {})),
-                      child: RestaurantCard(restaurant: _searchResult[index]));
-                }),
-          ),
-        ],
-      ),
-    );
+        height: SizeConfig.screenHeight * .63,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Expanded(
+              child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: BouncingScrollPhysics(),
+                  scrollDirection: Axis.vertical,
+                  itemCount: _searchResult.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index < _searchResult.length) {
+                      return GestureDetector(
+                          onTap: () => Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                      builder: (context) => new DetailScreen(
+                                          restaurant: _searchResult[index])))
+                              .then((value) => setState(() {})),
+                          child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 20),
+                              child: RestaurantCard(
+                                  restaurant: _searchResult[index])));
+                    } else {
+                      return Center(
+                        child: FloatingActionButton(
+                            backgroundColor: kPrimaryColor,
+                            onPressed: () {
+                              _loadMore();
+                            },
+                            child: Icon(Icons.arrow_downward_rounded)),
+                      );
+                    }
+                  }),
+            ),
+          ],
+        ));
   }
 }

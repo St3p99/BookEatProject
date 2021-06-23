@@ -1,5 +1,4 @@
 import 'package:client/model/objects/reservation.dart';
-import 'package:client/model/objects/user.dart';
 
 class Review {
   int id;
@@ -7,7 +6,6 @@ class Review {
   int serviceRating;
   int locationRating;
   Reservation reservation;
-
 
   Review({
     this.id,
@@ -23,17 +21,19 @@ class Review {
       foodRating: json['foodRating'],
       serviceRating: json['serviceRating'],
       locationRating: json['locationRating'],
-      reservation: json['reservation'] == null ? null : Reservation.fromJson(json["reservation"]),
+      reservation: json['reservation'] == null
+          ? null
+          : Reservation.fromJson(json["reservation"]),
     );
   }
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'foodRating': foodRating,
-    'serviceRating': serviceRating,
-    'locationRating': locationRating,
-    'reservation': reservation == null ? null : reservation.toJson(),
-  };
+        'id': id,
+        'foodRating': foodRating,
+        'serviceRating': serviceRating,
+        'locationRating': locationRating,
+        'reservation': reservation == null ? null : reservation.toJson(),
+      };
 
   @override
   String toString() {

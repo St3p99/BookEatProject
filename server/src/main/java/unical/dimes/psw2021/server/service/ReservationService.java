@@ -47,7 +47,7 @@ public class ReservationService {
         this.userRepository = userRepository;
     }
 
-    @Transactional( readOnly = true)
+    @Transactional(readOnly = true)
     public int getSeatsAvailable(Long serviceId, LocalDate date, LocalTime startTime) throws ResourceNotFoundException {
         return tableServiceRepository.findById(serviceId).map(tableService -> {
             if (!itIsAcceptable(tableService, date, startTime)) return 0;
@@ -99,7 +99,7 @@ public class ReservationService {
         }
 
         List<Reservation> reservationsOfRestaurantInDate = reservationRepository.
-                findByRestaurantAndDateAndRejectedFalse(tableService.getRestaurant(), date);
+                findByTableServiceAndDateAndRejectedFalse(tableService, date);
 
         int reservedSeats = countReservedSeats(reservationsOfRestaurantInDate, tableService, startTime);
         return tableService.getRestaurant().getSeatingCapacity() - reservedSeats - nGuests >= 0;
@@ -124,9 +124,9 @@ public class ReservationService {
         LocalTime reservationEndTime;
         for (Reservation reservation : reservations) {
             reservationStartTime = reservation.getStartTime();
-            if (reservation.getTableService() == null) //  reservation out of service
+            if (reservation.getTableService() == null) {//  reservation out of service
                 reservationEndTime = reservationStartTime.plusMinutes(defaultAvgMealDuration);
-            else reservationEndTime = reservationStartTime.plusMinutes(tableService.getAverageMealDuration());
+            } else reservationEndTime = reservationStartTime.plusMinutes(tableService.getAverageMealDuration());
 
             if ((reservationStartTime.compareTo(startTime) <= 0
                     && reservationEndTime.compareTo(startTime) > 0) ||

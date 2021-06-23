@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import unical.dimes.psw2021.server.model.Reservation;
 import unical.dimes.psw2021.server.model.Review;
-import unical.dimes.psw2021.server.model.TableService;
 import unical.dimes.psw2021.server.model.User;
 import unical.dimes.psw2021.server.repository.ReservationRepository;
 import unical.dimes.psw2021.server.repository.ReviewRepository;
@@ -32,15 +31,6 @@ public class UserService {
         this.reservationRepository = reservationRepository;
     }
 
-//    @Transactional(propagation = Propagation.REQUIRED)
-//    public User addUser(User user) throws UniqueKeyViolationException {
-//        if (userRepository.existsByEmail(user.getEmail())) {
-//            throw new UniqueKeyViolationException();
-//        }
-//
-//        return userRepository.save(user);
-//    }
-
     @Transactional(readOnly = true)
     public User getById(Long id) throws ResourceNotFoundException {
         return userRepository.findById(id).
@@ -49,7 +39,7 @@ public class UserService {
 
     public List<Reservation> showReservations(Long id) throws ResourceNotFoundException {
         Optional<User> optUser = userRepository.findById(id);
-        if(optUser.isEmpty()) throw new ResourceNotFoundException();
+        if (optUser.isEmpty()) throw new ResourceNotFoundException();
 
         return optUser.get().getReservations();
     }
@@ -62,7 +52,7 @@ public class UserService {
 
         //check posting reservation date and time
         LocalDateTime reservationDateTime = LocalDateTime.of(reservation.getDate(), reservation.getStartTime());
-        if( LocalDateTime.now().compareTo(reservationDateTime) <= 0 ){
+        if (LocalDateTime.now().compareTo(reservationDateTime) <= 0) {
             throw new PostingDateTimeException();
         }
 

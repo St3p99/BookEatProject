@@ -11,6 +11,6 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     boolean existsByReservation(Reservation reservation);
 
-    @Query( "SELECT R.review FROM Reservation AS R WHERE R.restaurant = ?1" )
+    @Query("SELECT R.review FROM Reservation AS R WHERE R.restaurant = ?1")
     List<Review> findReviewByReservation(Restaurant restaurant);
 }

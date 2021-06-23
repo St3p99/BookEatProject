@@ -1,4 +1,3 @@
-import 'package:client/model/support/extensions/string_capitalization.dart';
 import 'package:client/UI/behaviors/app_localizations.dart';
 import 'package:client/UI/screens/discover/discover_screen.dart';
 import 'package:client/UI/screens/profile/profile_screen.dart';
@@ -6,12 +5,11 @@ import 'package:client/UI/screens/reservations/reservations_screen.dart';
 import 'package:client/UI/screens/search/search_screen.dart';
 import 'package:client/UI/support/constants.dart';
 import 'package:client/UI/support/size_config.dart';
+import 'package:client/model/support/extensions/string_capitalization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:line_icons/line_icons.dart';
-
-import 'screens/detail/detail_screen.dart';
 
 enum NavPage { home, search, reservation, profile }
 
@@ -34,11 +32,14 @@ class _HomeState extends State<Home> {
       child: Scaffold(
         body: PageView(
           physics: NeverScrollableScrollPhysics(),
-          children:[
-            DiscoverScreen(), SearchScreen(), ReservationsScreen(), ProfileScreen()
+          children: [
+            DiscoverScreen(),
+            SearchScreen(),
+            ReservationsScreen(),
+            ProfileScreen()
           ],
           controller: pageController,
-          onPageChanged: (page){
+          onPageChanged: (page) {
             setState(() {
               _selectedPage = NavPage.values[page];
             });
@@ -56,9 +57,7 @@ class _HomeState extends State<Home> {
         decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
-                topLeft:Radius.circular(15),
-                topRight:Radius.circular(15)
-            ),
+                topLeft: Radius.circular(15), topRight: Radius.circular(15)),
             boxShadow: [
               BoxShadow(
                 blurRadius: 15,
@@ -66,15 +65,17 @@ class _HomeState extends State<Home> {
                 color: Colors.black.withOpacity(0.4),
                 offset: Offset(0, 10),
               )
-            ]
-        ),
+            ]),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
           child: GNav(
               hoverColor: kPrimaryColor.withOpacity(0.1),
               // tabActiveBorder: Border.all(color: kPrimaryColor, width: 1),
               // tabBorder: Border.all(color: Colors.grey, width: 1), // tab button border
-              tabShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 15)], // tab button shadow
+              tabShadow: [
+                BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 15)
+              ],
+              // tab button shadow
               curve: Curves.easeOutExpo,
               // tab animation curves
               duration: Duration(milliseconds: 500),
@@ -93,19 +94,26 @@ class _HomeState extends State<Home> {
               tabs: [
                 GButton(
                   icon: LineIcons.home,
-                  text: AppLocalizations.of(context).translate("home").capitalize,
+                  text:
+                      AppLocalizations.of(context).translate("home").capitalize,
                 ),
                 GButton(
                   icon: LineIcons.search,
-                  text: AppLocalizations.of(context).translate("search").capitalize,
+                  text: AppLocalizations.of(context)
+                      .translate("search")
+                      .capitalize,
                 ),
                 GButton(
                   icon: LineIcons.utensils,
-                  text: AppLocalizations.of(context).translate("reservation").capitalize,
+                  text: AppLocalizations.of(context)
+                      .translate("reservation")
+                      .capitalize,
                 ),
                 GButton(
                   icon: LineIcons.user,
-                  text: AppLocalizations.of(context).translate("profile").capitalize,
+                  text: AppLocalizations.of(context)
+                      .translate("profile")
+                      .capitalize,
                 ),
               ],
               selectedIndex: _selectedPage.index,
@@ -114,11 +122,9 @@ class _HomeState extends State<Home> {
                   _selectedPage = NavPage.values[index];
                 });
                 pageController.jumpToPage(_selectedPage.index);
-              }
-          ),
+              }),
         ),
       ),
     );
   }
 }
-

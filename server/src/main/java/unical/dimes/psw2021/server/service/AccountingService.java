@@ -1,10 +1,9 @@
 package unical.dimes.psw2021.server.service;
 
 import org.keycloak.OAuth2Constants;
-import org.keycloak.admin.client.KeycloakBuilder;
-import org.springframework.beans.factory.annotation.Value;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
@@ -12,8 +11,8 @@ import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,15 +35,22 @@ public class AccountingService {
     private final RestaurantService restaurantService;
     private final UserService userService;
 
-    @Value("${keycloak.auth-server-url}") private String serverUrl;
-    @Value("${admin.username.keycloak}") private String adminUsername;
-    @Value("${keycloak.client-key-password}")  private String adminPwd;
-    @Value("${keycloak.resource}") private String clientId;
-    @Value("${keycloak.realm}") private String realm;
-    @Value("${keycloak.credentials.secret}") private String clientSecret;
-    @Value("${role-user}") private String USER_ROLE;
-    @Value("${role-restaurant-manager}") private String RESTAURANT_MANAGER_ROLE;
-
+    @Value("${keycloak.auth-server-url}")
+    private String serverUrl;
+    @Value("${admin.username.keycloak}")
+    private String adminUsername;
+    @Value("${keycloak.client-key-password}")
+    private String adminPwd;
+    @Value("${keycloak.resource}")
+    private String clientId;
+    @Value("${keycloak.realm}")
+    private String realm;
+    @Value("${keycloak.credentials.secret}")
+    private String clientSecret;
+    @Value("${role-user}")
+    private String USER_ROLE;
+    @Value("${role-restaurant-manager}")
+    private String RESTAURANT_MANAGER_ROLE;
 
 
     @Autowired
@@ -57,7 +63,7 @@ public class AccountingService {
 
 
     @Transactional
-    public User registerUser(User user, String pwd) throws UniqueKeyViolationException, ConnectException{
+    public User registerUser(User user, String pwd) throws UniqueKeyViolationException, ConnectException {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new UniqueKeyViolationException();
         }
@@ -68,8 +74,8 @@ public class AccountingService {
         // Define user
         UserRepresentation userRepresentation = new UserRepresentation();
         userRepresentation.setEnabled(true);
-        userRepresentation.setUsername( user.getEmail() );
-        userRepresentation.setEmail( user.getEmail() );
+        userRepresentation.setUsername(user.getEmail());
+        userRepresentation.setEmail(user.getEmail());
         userRepresentation.setAttributes(Collections.singletonMap("origin", Arrays.asList("demo")));
 
         // Get realm
@@ -120,8 +126,8 @@ public class AccountingService {
         // Define user
         UserRepresentation userRepresentation = new UserRepresentation();
         userRepresentation.setEnabled(true);
-        userRepresentation.setUsername( restaurant.getPrivateMail() );
-        userRepresentation.setEmail( restaurant.getPrivateMail() );
+        userRepresentation.setUsername(restaurant.getPrivateMail());
+        userRepresentation.setEmail(restaurant.getPrivateMail());
         userRepresentation.setAttributes(Collections.singletonMap("origin", Arrays.asList("demo")));
 
         // Get realm
@@ -177,7 +183,7 @@ public class AccountingService {
     }
 
     @Transactional
-    public void deleteRestaurant(Long id){
+    public void deleteRestaurant(Long id) {
         Optional<Restaurant> opt = restaurantRepository.findById(id);
         if (opt.isEmpty()) return;
         Restaurant r = opt.get();
@@ -196,8 +202,8 @@ public class AccountingService {
         restaurantService.deleteRestaurant(r);
     }
 
-    @Transactional(propagation = Propagation.SUPPORTS )
-    public Keycloak getKeycloakObj(){
+    @Transactional(propagation = Propagation.SUPPORTS)
+    public Keycloak getKeycloakObj() {
         return KeycloakBuilder.builder()
                 .serverUrl(serverUrl)
                 .realm(realm)

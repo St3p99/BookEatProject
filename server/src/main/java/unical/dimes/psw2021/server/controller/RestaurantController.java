@@ -1,13 +1,11 @@
 package unical.dimes.psw2021.server.controller;
 
-import com.sun.mail.iap.ConnectionException;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import unical.dimes.psw2021.server.model.Reservation;
@@ -18,6 +16,7 @@ import unical.dimes.psw2021.server.service.RestaurantService;
 import unical.dimes.psw2021.server.support.ResponseMessage;
 import unical.dimes.psw2021.server.support.exception.TableServiceOverlapException;
 import unical.dimes.psw2021.server.support.exception.UniqueKeyViolationException;
+
 import javax.validation.Valid;
 import java.net.ConnectException;
 import java.time.LocalDate;
@@ -51,7 +50,7 @@ public class RestaurantController {
             return new ResponseEntity<>(
                     new ResponseMessage("ERROR_RESTAURANT_ALREADY_EXIST"),
                     HttpStatus.CONFLICT);
-        }catch (ConnectException e ){
+        } catch (ConnectException e) {
             return new ResponseEntity<>(
                     new ResponseMessage("ERROR_CONNECTION"),
                     HttpStatus.INTERNAL_SERVER_ERROR);
@@ -106,7 +105,7 @@ public class RestaurantController {
     public ResponseEntity getReservationsByRestaurantAndDate(
             @RequestParam("restaurant_id") Long id,
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
-            ){
+    ) {
         try {
             List<Reservation> result = restaurantService.showReservationsByRestaurantAndDate(id, date);
             if (result.size() <= 0)
@@ -117,9 +116,6 @@ public class RestaurantController {
         }
     }//getReservations
 
-    /**
-     * PUT OPERATION
-     ***/
 
     /**
      * DELETE OPERATION

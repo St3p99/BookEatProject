@@ -1,9 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-
-class PersistentStorageManager{
-
-
+class PersistentStorageManager {
   void setString(String key, String value) async {
     SharedPreferences _storage = await SharedPreferences.getInstance();
     _storage.setString(key, value);

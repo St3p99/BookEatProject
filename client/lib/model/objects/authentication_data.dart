@@ -4,8 +4,12 @@ class AuthenticationData {
   String error;
   int expiresIn;
 
-
-  AuthenticationData({this.accessToken, this.refreshToken, this.error, this.expiresIn,});
+  AuthenticationData({
+    this.accessToken,
+    this.refreshToken,
+    this.error,
+    this.expiresIn,
+  });
 
   factory AuthenticationData.fromJson(Map<String, dynamic> json) {
     return AuthenticationData(
@@ -19,6 +23,4 @@ class AuthenticationData {
   bool hasError() {
     return error != null;
   }
-
-
 }

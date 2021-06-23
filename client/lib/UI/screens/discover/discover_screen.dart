@@ -4,13 +4,8 @@ import 'package:client/UI/support/size_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../home.dart';
-
-
 class DiscoverScreen extends StatelessWidget {
-  const DiscoverScreen({
-    Key key
-  }) : super(key: key);
+  const DiscoverScreen({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +23,7 @@ class DiscoverScreen extends StatelessWidget {
 
   Widget DiscoverHeader(BuildContext context) {
     return Container(
-        height: SizeConfig.screenHeight*0.1,
+        height: SizeConfig.screenHeight * 0.1,
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -39,10 +34,11 @@ class DiscoverScreen extends StatelessWidget {
             ),
           ],
           borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20)),
         ),
         child: Padding(
-          padding: const EdgeInsets.only(left:15, right: 10),
+          padding: const EdgeInsets.only(left: 15, right: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -56,7 +52,6 @@ class DiscoverScreen extends StatelessWidget {
               )
             ],
           ),
-        )
-    );
+        ));
   }
 }
