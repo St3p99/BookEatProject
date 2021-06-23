@@ -202,6 +202,7 @@ class _RestaurantsInAreaState extends State<RestaurantsInArea> {
   }
 
   Future<void> _pullData() async {
+    _currentPage = 0;
     List<Restaurant> freshRestaurant = await Model.sharedInstance
         .searchRestaurantByCity(
             Model.sharedInstance.currentUser.city, _currentPage);

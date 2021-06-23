@@ -207,12 +207,15 @@ class _SearchScreenState extends State<SearchScreen> {
       await Model.sharedInstance.loadRestaurantsReviews(result);
       setState(() {
         _searchResult.addAll(result);
-        _searching = false;
       });
     }
+    setState(() {
+      _searching = false;
+    });
   }
 
   Future<void> _search() async {
+    _currentPage = 0;
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
