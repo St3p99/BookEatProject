@@ -6,50 +6,65 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import unical.dimes.psw2021.server.model.Reservation;
 import unical.dimes.psw2021.server.model.Restaurant;
 import unical.dimes.psw2021.server.model.TableService;
+import unical.dimes.psw2021.server.service.AccountingService;
 import unical.dimes.psw2021.server.service.RestaurantService;
 import unical.dimes.psw2021.server.support.ResponseMessage;
 import unical.dimes.psw2021.server.support.exception.TableServiceOverlapException;
 import unical.dimes.psw2021.server.support.exception.UniqueKeyViolationException;
+
 import javax.validation.Valid;
+import java.net.ConnectException;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.springframework.beans.support.PagedListHolder.DEFAULT_PAGE_SIZE;
-
 @RestController
-@RequestMapping(path = "${base.url}/restaurants")
+@RequestMapping(path = "${base-url}/restaurants")
+//@PreAuthorize("hasAuthority('restaurant_manager')")
 public class RestaurantController {
     private final RestaurantService restaurantService;
+    private final AccountingService accountingService;
 
     @Autowired
-    public RestaurantController(RestaurantService restaurantService) {
+    public RestaurantController(RestaurantService restaurantService, AccountingService accountingService) {
         this.restaurantService = restaurantService;
+        this.accountingService = accountingService;
     }
 
     /**
      * POST OPERATION
      ***/
-    @Operation(summary = "Add new restaurant")
+    @Operation(method = "newRestaurant", summary = "Create a new restaurant")
     @PostMapping("/new")
-    public ResponseEntity newRestaurant(@RequestBody @Valid Restaurant restaurant) {
+    public ResponseEntity newRestaurant(@RequestBody @Valid Restaurant restaurant, BindingResult bindingResult, @RequestParam(value = "pwd") String pwd) {
+        if (bindingResult.hasErrors()) return ResponseEntity.badRequest().build();
         try {
             return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(restaurantService.addRestaurant(restaurant));
+                    .body(accountingService.registerRestaurant(restaurant, pwd));
         } catch (UniqueKeyViolationException e) {
             return new ResponseEntity<>(
                     new ResponseMessage("ERROR_RESTAURANT_ALREADY_EXIST"),
                     HttpStatus.CONFLICT);
+        } catch (ConnectException e) {
+            return new ResponseEntity<>(
+                    new ResponseMessage("ERROR_CONNECTION"),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }//newRestaurant
 
-    @Operation(summary = "Add new table service")
-    @PostMapping(value = "/{id}/services/new")
-    public ResponseEntity newTableService(@PathVariable Long id, @RequestBody @Valid TableService tableService) {
+    @Operation(method = "newTableService", summary = "Create a new table service")
+    @PostMapping(value = "/services/new/{restaurant_id}")
+    public ResponseEntity newTableService(
+            @PathVariable("restaurant_id") Long id,
+            @RequestBody @Valid TableService tableService, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) return ResponseEntity.badRequest().build();
+
         try {
             return ResponseEntity
                     .status(HttpStatus.CREATED)
@@ -72,9 +87,9 @@ public class RestaurantController {
     /**
      * GET OPERATION
      ***/
-    @Operation(summary = "Return all table service of the restauraunt with id")
-    @GetMapping(path = "/{id}/services")
-    public ResponseEntity getTableServices(@PathVariable Long id) {
+    @Operation(method = "getTableServices", summary = "Return all table service of the restauraunt with id")
+    @GetMapping(path = "/services")
+    public ResponseEntity getTableServices(@RequestParam("restaurant_id") Long id) {
         try {
             List<TableService> result = restaurantService.showTableServices(id);
             if (result.size() <= 0)
@@ -85,14 +100,14 @@ public class RestaurantController {
         }
     }//getTableServices
 
-    @Operation(summary = "Return reservations of the restauraunt per table service with id")
-    @GetMapping(path = "/{id}/reservations/{date}")
-    public ResponseEntity getReservationsByServiceAndDate(
-            @PathVariable Long id,
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
-            ){
+    @Operation(method = "getReservationsByRestaurantAndDate", summary = "Return reservations of the restauraunt with id")
+    @GetMapping(path = "/reservations")
+    public ResponseEntity getReservationsByRestaurantAndDate(
+            @RequestParam("restaurant_id") Long id,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
         try {
-            List<Reservation> result = restaurantService.showReservationsByServiceAndDate(id, date);
+            List<Reservation> result = restaurantService.showReservationsByRestaurantAndDate(id, date);
             if (result.size() <= 0)
                 return ResponseEntity.noContent().build();
             return ResponseEntity.ok(result);
@@ -101,28 +116,25 @@ public class RestaurantController {
         }
     }//getReservations
 
-    /**
-     * PUT OPERATION
-     ***/
 
     /**
      * DELETE OPERATION
      ***/
-    @Operation(summary = "Reject a reservation")
-    @DeleteMapping(path = "/reservations/delete/{id}")
+    @Operation(method = "rejectReservation", summary = "Reject a reservation")
+    @DeleteMapping(path = "/reservations/reject/{id}")
     public ResponseEntity rejectReservation(@PathVariable Long id) {
         restaurantService.rejectReservation(id);
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Delete restaurant")
+    @Operation(method = "deleteRestaurant", summary = "Delete restaurant")
     @DeleteMapping(path = "/delete/{id}")
     public ResponseEntity deleteRestaurant(@PathVariable Long id) {
-        restaurantService.deleteRestaurant(id);
+        accountingService.deleteRestaurant(id);
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Delete a table service")
+    @Operation(method = "deleteTableService", summary = "Delete a table service")
     @DeleteMapping(path = "/services/delete/{id}")
     public ResponseEntity deleteTableService(@PathVariable Long id) {
         restaurantService.deleteTableService(id);

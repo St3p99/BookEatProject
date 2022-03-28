@@ -1,7 +1,7 @@
 name: client
-description: BookEat - Flutter project
+description: BookIT - frontend
 
-publish_to: 'none'
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 version: 1.0.0+1
 
@@ -11,21 +11,68 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
   flutter_localizations:
     sdk: flutter
 
-  cupertino_icons: ^1.0.1
-  http: ^0.12.0+4
+  google_fonts: ^1.1.0
+  cupertino_icons: ^1.0.2
+  carousel_slider: ^3.0.0
+  http: any
+  flutter_rating_bar: ^4.0.0
+  google_nav_bar: ^5.0.5
+  line_icons: ^2.0.1
+  circular_profile_avatar: ^2.0.0
+  percent_indicator: ^3.0.1
+  expandable: ^5.0.1
+  intl: ^0.17.0
+  cupertino_stepper: ^0.2.0
+  pull_to_refresh: ^2.0.0
+  shared_preferences: ^2.0.5
+  auto_size_text: ^2.1.0
+  email_validator: ^2.0.1
+  page_transition: ^2.0.2
+  flutter_google_places: ^0.2.8
+  google_place: ^0.3.3
+  google_api_headers: ^0.1.1+2
+  rflutter_alert: ^2.0.2
+  cool_alert: ^1.0.3
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  integration_test:
-    sdk: flutter
+
+  flutter_launcher_name: "^0.0.1"
+  flutter_launcher_icons: "^0.8.0"
+
+flutter_launcher_name:
+  name: "BookIT"
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/app.png"
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: Oswald
+      fonts:
+        - asset: assets/fonts/Oswald-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Oswald-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Oswald-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Oswald-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Oswald-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Oswald-ExtraLight.ttf
+          weight: 200
 
   assets:
-    - localizable/
+    - assets/images/
+    - assets/icons/
+    - assets/localizable/
+

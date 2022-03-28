@@ -7,6 +7,9 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 
@@ -31,17 +34,26 @@ public class User {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @NotBlank
     @Column(name = "first_name", nullable = false, length = 30)
     private String firstName;
 
+    @NotBlank
     @Column(name = "last_name", nullable = false, length = 30)
     private String lastName;
 
+    @NotBlank
     @Column(name = "phone", nullable = false, length = 15)
     private String phone;
 
+    @NotNull
+    @Email
     @Column(name = "email", nullable = false, length = 50)
     private String email;
+
+    @NotBlank
+    @Column(name = "city", nullable = false, length = 100)
+    private String city;
 
     @EqualsAndHashCode.Exclude
     @ToString.Exclude

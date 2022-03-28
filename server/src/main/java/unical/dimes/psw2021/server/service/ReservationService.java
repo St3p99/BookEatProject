@@ -20,6 +20,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.OptimisticLockException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +35,7 @@ public class ReservationService {
     @Autowired
     private EntityManager entityManager;
 
-    @Value("${default.average.meal.duration}")
+    @Value("${default-average-meal-duration}")
     private int defaultAvgMealDuration;
 
 
@@ -46,16 +47,16 @@ public class ReservationService {
         this.userRepository = userRepository;
     }
 
-    @Transactional( readOnly = true)
-    public boolean getAvailability(Long serviceId, LocalDate date, LocalTime startTime, int nGuests) throws ResourceNotFoundException {
+    @Transactional(readOnly = true)
+    public int getSeatsAvailable(Long serviceId, LocalDate date, LocalTime startTime) throws ResourceNotFoundException {
         return tableServiceRepository.findById(serviceId).map(tableService -> {
-            if (!itIsAcceptable(tableService, date, startTime)) return false;
+            if (!itIsAcceptable(tableService, date, startTime)) return 0;
 
             List<Reservation> reservationsOfRestaurantInDate = reservationRepository.
-                    findByRestaurantAndDate(tableService.getRestaurant(), date);
+                    findByRestaurantAndDateAndRejectedFalse(tableService.getRestaurant(), date);
 
             int reservedSeats = countReservedSeats(reservationsOfRestaurantInDate, tableService, startTime);
-            return tableService.getRestaurant().getSeatingCapacity() - reservedSeats - nGuests >= 0;
+            return tableService.getRestaurant().getSeatingCapacity() - reservedSeats;
         }).orElseThrow(ResourceNotFoundException::new);
     }
 
@@ -71,11 +72,10 @@ public class ReservationService {
         if (optUser.isEmpty()) throw new ResourceNotFoundException();
         newReservation.setUser(optUser.get());
 
-        if (reservationRepository.existsByUserAndRestaurantAndDateAndStartTime(
+        if (reservationRepository.existsByUserAndTableServiceAndDateAndRejectedFalse(
                 newReservation.getUser(),
-                newReservation.getRestaurant(),
-                newReservation.getDate(),
-                newReservation.getStartTime())) {
+                newReservation.getTableService(),
+                newReservation.getDate())) {
             throw new UniqueKeyViolationException();
         }
 
@@ -85,7 +85,7 @@ public class ReservationService {
         boolean seatsAreAvailable = getAvailabilityWithLock(newReservation.getTableService(),
                 newReservation.getDate(),
                 newReservation.getStartTime(),
-                newReservation.getNGuests());
+                newReservation.getGuests());
 
         if (!seatsAreAvailable) throw new SeatsUnavailable();
 
@@ -94,10 +94,12 @@ public class ReservationService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public boolean getAvailabilityWithLock(TableService tableService, LocalDate date, LocalTime startTime, int nGuests) {
-        if (!itIsAcceptable(tableService, date, startTime)) return false;
+        if (!itIsAcceptable(tableService, date, startTime)) {
+            return false;
+        }
 
         List<Reservation> reservationsOfRestaurantInDate = reservationRepository.
-                findByRestaurantAndDate(tableService.getRestaurant(), date);
+                findByTableServiceAndDateAndRejectedFalse(tableService, date);
 
         int reservedSeats = countReservedSeats(reservationsOfRestaurantInDate, tableService, startTime);
         return tableService.getRestaurant().getSeatingCapacity() - reservedSeats - nGuests >= 0;
@@ -105,11 +107,11 @@ public class ReservationService {
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public boolean itIsAcceptable(TableService tableService, LocalDate date, LocalTime startTime) {
-        LocalTime endTime = startTime.plusMinutes(tableService.getAverageMealDuration());
         // Service available at date and at time
         return tableService.getDaysOfWeek().contains(date.getDayOfWeek())
                 && tableService.getStartTime().compareTo(startTime) <= 0
-                && tableService.getEndTime().compareTo(endTime) >= 0;
+                && tableService.getEndTime().compareTo(startTime) >= 0
+                && LocalDateTime.now().compareTo(LocalDateTime.of(date, startTime)) <= 0;
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)
@@ -122,16 +124,16 @@ public class ReservationService {
         LocalTime reservationEndTime;
         for (Reservation reservation : reservations) {
             reservationStartTime = reservation.getStartTime();
-            if (reservation.getTableService() == null) //  reservation out of service
+            if (reservation.getTableService() == null) {//  reservation out of service
                 reservationEndTime = reservationStartTime.plusMinutes(defaultAvgMealDuration);
-            else reservationEndTime = reservationStartTime.plusMinutes(tableService.getAverageMealDuration());
+            } else reservationEndTime = reservationStartTime.plusMinutes(tableService.getAverageMealDuration());
 
             if ((reservationStartTime.compareTo(startTime) <= 0
                     && reservationEndTime.compareTo(startTime) > 0) ||
                     ((reservationStartTime.compareTo(endTime) < 0
                             && reservationEndTime.compareTo(endTime) >= 0))) {
                 // counts seats in reservation as reserved
-                reservedSeats += reservation.getNGuests();
+                reservedSeats += reservation.getGuests();
             }
         }
         return reservedSeats;
